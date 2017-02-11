@@ -19,12 +19,13 @@ func makeSentence(s string) ([]*Word, error) {
 	heads := strings.Split(strings.TrimSpace(lines[3]), "\t")
 
 	sent := make([]*Word, 0)
+	sent = append(sent, makeRootWord())
 	for i := 0; i < len(words); i++ {
 		head, err := strconv.ParseInt(heads[i], 10, 0)
 		if err != nil {
 			return nil, err
 		}
-		sent = append(sent, makeWord(words[i], posTags[i], i, int(head)))
+		sent = append(sent, makeWord(words[i], posTags[i], i+1, int(head)))
 	}
 	return sent, nil
 }

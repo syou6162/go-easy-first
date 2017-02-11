@@ -12,3 +12,7 @@ type Word struct {
 func makeWord(surface string, posTag string, idx int, head int) *Word {
 	return &Word{surface, surface, posTag, posTag, idx, head}
 }
+
+func makeRootWord() *Word {
+	return makeWord("*ROOT*", "*ROOT*", 0, -1)
+}
