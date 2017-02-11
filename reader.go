@@ -9,7 +9,11 @@ import (
 	"strings"
 )
 
-func makeSentence(s string) ([]*Word, error) {
+type Sentence struct {
+	words []*Word
+}
+
+func makeSentence(s string) (*Sentence, error) {
 	lines := strings.Split(s, "\n")
 	if len(lines) < 4 {
 		return nil, errors.New("Invalid line")
@@ -27,7 +31,7 @@ func makeSentence(s string) ([]*Word, error) {
 		}
 		sent = append(sent, makeWord(words[i], posTags[i], i+1, int(head)))
 	}
-	return sent, nil
+	return &Sentence{sent}, nil
 }
 
 func splitBySentence(s string) []string {
@@ -41,7 +45,7 @@ func main() {
 	}
 	for _, sent := range splitBySentence(string(data)) {
 		s, _ := makeSentence(sent)
-		for _, sss := range s {
+		for _, sss := range s.words {
 			fmt.Println(sss)
 		}
 	}
