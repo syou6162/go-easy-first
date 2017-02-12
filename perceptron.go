@@ -27,3 +27,31 @@ func EdgeFor(state *State, actionID int, idx int) ([]int, error) {
 		return nil, errors.New("Invalid line")
 	}
 }
+
+// IsValid returns the chosen action/location pair is valid
+func IsValid(state *State, actionID int, idx int, goldArcs map[int][]int) bool {
+	pair, err := EdgeFor(state, actionID, idx)
+	if err != nil {
+		return false
+	}
+	pIdx := pair[0]
+	cIdx := pair[1]
+	containedInGoldArcs := false
+	for _, i := range goldArcs[pIdx] {
+		if cIdx == i {
+			containedInGoldArcs = true
+			break
+		}
+	}
+	flag := false
+	for _, cPrime := range goldArcs[cIdx] {
+		if cIdx != state.arcs[cPrime] {
+			flag = true
+			break
+		}
+	}
+	if !containedInGoldArcs || flag {
+		return false
+	}
+	return true
+}
