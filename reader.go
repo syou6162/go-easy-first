@@ -9,10 +9,6 @@ import (
 	"strings"
 )
 
-type Sentence struct {
-	words []*Word
-}
-
 func makeSentence(s string) (*Sentence, error) {
 	lines := strings.Split(s, "\n")
 	if len(lines) < 4 {
