@@ -6,7 +6,7 @@ import "errors"
 func GoldArcs(sent *Sentence) map[int][]int {
 	result := make(map[int][]int)
 	for idx, w := range sent.words {
-		head := w.head
+		head := *w.head
 		if children, ok := result[head]; ok {
 			result[head] = append(children, idx)
 		} else {
