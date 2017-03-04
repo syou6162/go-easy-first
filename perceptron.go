@@ -55,3 +55,30 @@ func IsValid(state *State, actionID int, idx int, goldArcs map[int][]int) bool {
 	}
 	return true
 }
+
+type ActionIndexPair struct {
+	action StateAction
+	index  int
+}
+
+func AllowedActions(state *State, goldArcs map[int][]int) []ActionIndexPair {
+	result := make([]ActionIndexPair, 0)
+	for actionID, f := range StateActions {
+		for idx := 0; idx < len(state.pending)-1; idx++ {
+			if IsValid(state, actionID, idx, goldArcs) {
+				result = append(result, ActionIndexPair{f, idx})
+			}
+		}
+	}
+	return result
+}
+
+func CandidateActions(state *State) []ActionIndexPair {
+	result := make([]ActionIndexPair, 0)
+	for _, f := range StateActions {
+		for idx := 0; idx < len(state.pending)-1; idx++ {
+			result = append(result, ActionIndexPair{f, idx})
+		}
+	}
+	return result
+}
