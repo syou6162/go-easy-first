@@ -114,3 +114,25 @@ func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPa
 	}
 	return bestPair
 }
+
+type Model struct {
+	weight    map[string]float64
+	cumWeight map[string]float64
+	count     int
+}
+
+func (model *Model) updateWeight(goldFeatureVector *[]string, predictFeatureVector *[]string) {
+	for _, feat := range *goldFeatureVector {
+		w, _ := model.weight[feat]
+		cumW, _ := model.cumWeight[feat]
+		model.weight[feat] = w + 1.0
+		model.cumWeight[feat] = cumW + float64(model.count)
+	}
+	for _, feat := range *predictFeatureVector {
+		w, _ := model.weight[feat]
+		cumW, _ := model.cumWeight[feat]
+		model.weight[feat] = w - 1.0
+		model.cumWeight[feat] = cumW - float64(model.count)
+	}
+	model.count += 1
+}
