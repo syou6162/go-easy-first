@@ -2,7 +2,14 @@ package main
 
 import "fmt"
 
-func addOneHandFeatures(features *[]string, w *Word, side string) {
+type Side int
+
+const (
+	LEFT Side = iota
+	RIGHT
+)
+
+func addOneHandFeatures(features *[]string, w *Word, side Side) {
 	*features = append(*features,
 		fmt.Sprintf("side:%s+surface:%s", side, w.surface),
 		fmt.Sprintf("side:%s+lemma:%s", side, w.lemma),
@@ -12,11 +19,11 @@ func addOneHandFeatures(features *[]string, w *Word, side string) {
 }
 
 func addLeftHandFeatures(features *[]string, state *State, idx int) {
-	addOneHandFeatures(features, state.pending[idx], "left")
+	addOneHandFeatures(features, state.pending[idx], LEFT)
 }
 
 func addRightHandFeatures(features *[]string, state *State, idx int) {
-	addOneHandFeatures(features, state.pending[idx+1], "right")
+	addOneHandFeatures(features, state.pending[idx+1], RIGHT)
 }
 
 func extractFeature(state *State, idx int) []string {

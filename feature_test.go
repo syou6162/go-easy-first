@@ -7,7 +7,7 @@ import (
 func TestAddOneHandFeatures(t *testing.T) {
 	features := make([]string, 0)
 	word := makeWord("plays", "VBZ", 3, 0)
-	addOneHandFeatures(&features, word, "right")
+	addOneHandFeatures(&features, word, RIGHT)
 	if len(features) == 0 {
 		t.Error("length of features must be greater than 0")
 	}
