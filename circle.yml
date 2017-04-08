@@ -1,0 +1,8 @@
+machine:
+  timezone:
+    Asia/Tokyo
+
+test:
+  override:
+    - go test -v ./...
+    - test `gofmt -l . | wc -l` = 0
