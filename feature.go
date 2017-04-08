@@ -11,10 +11,10 @@ const (
 
 func addOneHandFeatures(features *[]string, w *Word, side Side) {
 	*features = append(*features,
-		fmt.Sprintf("side:%s+surface:%s", side, w.surface),
-		fmt.Sprintf("side:%s+lemma:%s", side, w.lemma),
-		fmt.Sprintf("side:%s+posTag:%s", side, w.posTag),
-		fmt.Sprintf("side:%s+cposTag:%s", side, w.cposTag),
+		fmt.Sprintf("side:%d+surface:%s", side, w.surface),
+		fmt.Sprintf("side:%d+lemma:%s", side, w.lemma),
+		fmt.Sprintf("side:%d+posTag:%s", side, w.posTag),
+		fmt.Sprintf("side:%d+cposTag:%s", side, w.cposTag),
 	)
 }
 
