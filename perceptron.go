@@ -1,6 +1,9 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"math"
+)
 
 // GoldArcs returns map of parent => children
 func GoldArcs(sent *Sentence) map[int][]int {
@@ -81,4 +84,33 @@ func CandidateActions(state *State) []ActionIndexPair {
 		}
 	}
 	return result
+}
+
+func DotProduct(weight *map[string]float64, fv []string) float64 {
+	sum := 0.0
+	for _, f := range fv {
+		if v, ok := (*weight)[f]; ok {
+			sum += v
+		}
+	}
+	return 0.0
+}
+
+func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPair {
+	bestScore := math.Inf(-1)
+	pairs := CandidateActions(state)
+	bestPair := pairs[0]
+	for pairIdx, pair := range pairs {
+		idx := pair.index
+		score := 0.0
+		if pairIdx % 2 == 0 { // AttachLeft
+			score = DotProduct(weight, extractFeature(state, idx))
+		} else { // AttachRight
+			score = DotProduct(weight, extractFeature(state, idx))
+		}
+		if score > bestScore {
+			bestPair = pair
+		}
+	}
+	return bestPair
 }
