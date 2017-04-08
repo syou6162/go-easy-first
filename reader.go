@@ -2,9 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"io/ioutil"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -32,17 +29,4 @@ func makeSentence(s string) (*Sentence, error) {
 
 func splitBySentence(s string) []string {
 	return strings.Split(s, "\n\n")
-}
-
-func main() {
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		panic(err)
-	}
-	for _, sent := range splitBySentence(string(data)) {
-		s, _ := makeSentence(sent)
-		for _, sss := range s.words {
-			fmt.Println(sss)
-		}
-	}
 }
