@@ -5,7 +5,7 @@ import "fmt"
 type Side int
 
 const (
-	LEFT  Side = iota
+	LEFT Side = iota
 	RIGHT
 )
 

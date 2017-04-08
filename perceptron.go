@@ -103,7 +103,7 @@ func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPa
 	for pairIdx, pair := range pairs {
 		idx := pair.index
 		score := 0.0
-		if pairIdx % 2 == 0 { // AttachLeft
+		if pairIdx%2 == 0 { // AttachLeft
 			score = DotProduct(weight, extractFeature(state, idx))
 		} else { // AttachRight
 			score = DotProduct(weight, extractFeature(state, idx))
