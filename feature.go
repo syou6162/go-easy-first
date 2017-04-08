@@ -29,6 +29,6 @@ func addRightHandFeatures(features *[]string, state *State, idx int) {
 func extractFeature(state *State, idx int) []string {
 	features := make([]string, 0)
 	addLeftHandFeatures(&features, state, idx)
-	addRightHandFeatures(&features, state, idx+1)
+	addRightHandFeatures(&features, state, idx)
 	return features
 }
