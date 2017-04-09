@@ -31,7 +31,7 @@ func TestExtractAttachLeftFeature(t *testing.T) {
 		makeWord(".", ".", 5, 3),
 	)
 	s := &State{words, make(map[int]int)}
-	features := extractAttachLeftFeature(s, 2)
+	features := extractAttachLeftFeatures(s, 2)
 	if len(features) == 0 {
 		t.Error("length of features must be greater than 0")
 	}
@@ -48,7 +48,7 @@ func TestExtractAttachRightFeature(t *testing.T) {
 		makeWord(".", ".", 5, 3),
 	)
 	s := &State{words, make(map[int]int)}
-	features := extractAttachRightFeature(s, 2)
+	features := extractAttachRightFeatures(s, 2)
 	if len(features) == 0 {
 		t.Error("length of features must be greater than 0")
 	}
