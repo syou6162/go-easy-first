@@ -148,4 +148,7 @@ func TestUpdate(t *testing.T) {
 	sent := Sentence{words: words}
 	model := Model{make(map[string]float64), make(map[string]float64), 1}
 	model.Update(&sent)
+	if model.count == 1 {
+		t.Error("count must be greater than 1")
+	}
 }
