@@ -107,9 +107,8 @@ func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPa
 	pairs := CandidateActions(state)
 	bestPair := pairs[0]
 	for _, pair := range pairs {
-		score := 0.0
 		fv, _ := ExtractFeatures(state, pair)
-		score = DotProduct(weight, fv)
+		score := DotProduct(weight, fv)
 		if score > bestScore {
 			bestPair = pair
 			bestScore = score
