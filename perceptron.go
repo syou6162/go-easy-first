@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"reflect"
 )
@@ -158,15 +157,12 @@ func (model *Model) updateWeight(goldFeatureVector *[]string, predictFeatureVect
 func (model *Model) Update(gold *Sentence) {
 	state := &State{gold.words, make(map[int]int)}
 	goldArcs := GoldArcs(gold)
-	fmt.Println(goldArcs)
 	iter := 0
 	for {
 		if len(state.pending) <= 1 {
 			break
 		}
 		allow := AllowedActions(state, goldArcs)
-		//fmt.Println(len(allow))
-		//fmt.Println(allow)
 		choice := BestActionIndexPair(&model.weight, state)
 		containChoice := false
 		//fmt.Println(choice)
@@ -176,28 +172,16 @@ func (model *Model) Update(gold *Sentence) {
 			}
 		}
 		if containChoice {
-			fmt.Println("contains!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 			choice.action(state, choice.index)
 		} else {
 			predFv, _ := ExtractFeatures(state, choice)
 			good := BestAllowedActionIndexPair(&model.weight, state, allow)
 			goodFv, _ := ExtractFeatures(state, good)
-			fmt.Println(goodFv)
-			fmt.Println(predFv)
 			model.updateWeight(&goodFv, &predFv)
 		}
-		//fmt.Println(containChoice)
-		//fmt.Println(allow)
-		//fmt.Println(choice)
-		//fmt.Println(state)
-
 		iter++
-		if iter > 500 {
-			fmt.Println("iter")
-			fmt.Println(iter)
-			//break
+		if iter > 500 { // for infinite loop
+			break
 		}
 	}
-	fmt.Println(state)
-	fmt.Println(model)
 }
