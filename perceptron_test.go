@@ -134,3 +134,18 @@ func TestUpdateWeight(t *testing.T) {
 		t.Error("cumWeight of '4' must be -3")
 	}
 }
+
+func TestUpdate(t *testing.T) {
+	words := make([]*Word, 0)
+	words = append(words,
+		makeRootWord(),
+		makeWord("ms.", "NNP", 1, 2),
+		makeWord("hang", "NNP", 2, 3),
+		makeWord("plays", "VBZ", 3, 0),
+		makeWord("elianti", "NNP", 4, 3),
+		makeWord(".", ".", 5, 3),
+	)
+	sent := Sentence{words: words}
+	model := Model{make(map[string]float64), make(map[string]float64), 1}
+	model.Update(&sent)
+}
