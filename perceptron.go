@@ -2,7 +2,9 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math"
+	"reflect"
 )
 
 // GoldArcs returns map of parent => children
@@ -116,8 +118,16 @@ func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPa
 	}
 	return bestPair
 }
+
+func BestAllowedActionIndexPair(weight *map[string]float64, state *State, pairs []ActionIndexPair) ActionIndexPair {
+	bestScore := math.Inf(-1)
+	bestPair := pairs[0]
+	for _, pair := range pairs {
+		fv, _ := ExtractFeatures(state, pair)
+		score := DotProduct(weight, fv)
 		if score > bestScore {
 			bestPair = pair
+			bestScore = score
 		}
 	}
 	return bestPair
@@ -143,4 +153,51 @@ func (model *Model) updateWeight(goldFeatureVector *[]string, predictFeatureVect
 		model.cumWeight[feat] = cumW - float64(model.count)
 	}
 	model.count += 1
+}
+
+func (model *Model) Update(gold *Sentence) {
+	state := &State{gold.words, make(map[int]int)}
+	goldArcs := GoldArcs(gold)
+	fmt.Println(goldArcs)
+	iter := 0
+	for {
+		if len(state.pending) <= 1 {
+			break
+		}
+		allow := AllowedActions(state, goldArcs)
+		//fmt.Println(len(allow))
+		//fmt.Println(allow)
+		choice := BestActionIndexPair(&model.weight, state)
+		containChoice := false
+		//fmt.Println(choice)
+		for _, pair := range allow {
+			if pair.SameActionIndexPair(choice) {
+				containChoice = true
+			}
+		}
+		if containChoice {
+			fmt.Println("contains!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+			choice.action(state, choice.index)
+		} else {
+			predFv, _ := ExtractFeatures(state, choice)
+			good := BestAllowedActionIndexPair(&model.weight, state, allow)
+			goodFv, _ := ExtractFeatures(state, good)
+			fmt.Println(goodFv)
+			fmt.Println(predFv)
+			model.updateWeight(&goodFv, &predFv)
+		}
+		//fmt.Println(containChoice)
+		//fmt.Println(allow)
+		//fmt.Println(choice)
+		//fmt.Println(state)
+
+		iter++
+		if iter > 500 {
+			fmt.Println("iter")
+			fmt.Println(iter)
+			//break
+		}
+	}
+	fmt.Println(state)
+	fmt.Println(model)
 }
