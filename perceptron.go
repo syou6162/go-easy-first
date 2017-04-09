@@ -64,6 +64,11 @@ type ActionIndexPair struct {
 	index  int
 }
 
+func (pair1 ActionIndexPair) SameActionIndexPair(pair2 ActionIndexPair) bool {
+	return pair1.index == pair2.index &&
+		reflect.ValueOf(pair1.action).Pointer() == reflect.ValueOf(pair2.action).Pointer()
+}
+
 func AllowedActions(state *State, goldArcs map[int][]int) []ActionIndexPair {
 	result := make([]ActionIndexPair, 0)
 	for actionID, f := range StateActions {
@@ -100,14 +105,17 @@ func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPa
 	bestScore := math.Inf(-1)
 	pairs := CandidateActions(state)
 	bestPair := pairs[0]
-	for pairIdx, pair := range pairs {
-		idx := pair.index
+	for _, pair := range pairs {
 		score := 0.0
-		if pairIdx%2 == 0 { // AttachLeft
-			score = DotProduct(weight, extractAttachLeftFeature(state, idx))
-		} else { // AttachRight
-			score = DotProduct(weight, extractAttachRightFeature(state, idx))
+		fv, _ := ExtractFeatures(state, pair)
+		score = DotProduct(weight, fv)
+		if score > bestScore {
+			bestPair = pair
+			bestScore = score
 		}
+	}
+	return bestPair
+}
 		if score > bestScore {
 			bestPair = pair
 		}
