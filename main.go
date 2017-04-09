@@ -20,8 +20,12 @@ func main() {
 		sentences = append(sentences, s)
 	}
 
-	weight := make(map[string]float64)
+	model := Model{make(map[string]float64), make(map[string]float64), 1}
 	for _, sent := range sentences {
-		Decode(&weight, sent)
+		model.Update(sent)
+	}
+
+	for _, sent := range sentences {
+		Decode(&model.weight, sent)
 	}
 }
