@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"reflect"
+)
 
 type Side int
 
@@ -53,4 +57,14 @@ func extractAttachRightFeatures(state *State, idx int) []string {
 	child := state.pending[idx]
 	addBothHandFeatures(&features, parent, child)
 	return features
+}
+
+func ExtractFeatures(state *State, pair ActionIndexPair) ([]string, error) {
+	if reflect.ValueOf(pair.action).Pointer() == reflect.ValueOf(AttachLeft).Pointer() {
+		return extractAttachLeftFeatures(state, pair.index), nil
+	} else if reflect.ValueOf(pair.action).Pointer() == reflect.ValueOf(AttachRight).Pointer() {
+		return extractAttachRightFeatures(state, pair.index), nil
+	} else {
+		return nil, errors.New("wrong action")
+	}
 }
