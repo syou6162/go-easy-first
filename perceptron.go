@@ -93,7 +93,7 @@ func DotProduct(weight *map[string]float64, fv []string) float64 {
 			sum += v
 		}
 	}
-	return 0.0
+	return sum
 }
 
 func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPair {
