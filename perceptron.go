@@ -107,7 +107,7 @@ func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPa
 	pairs := CandidateActions(state)
 	bestPair := pairs[0]
 	for _, pair := range pairs {
-		fv, _ := ExtractFeatures(state, pair)
+		fv := state.GetFvCache(pair)
 		score := DotProduct(weight, fv)
 		if score > bestScore {
 			bestPair = pair
@@ -121,7 +121,7 @@ func BestAllowedActionIndexPair(weight *map[string]float64, state *State, pairs 
 	bestScore := math.Inf(-1)
 	bestPair := pairs[0]
 	for _, pair := range pairs {
-		fv, _ := ExtractFeatures(state, pair)
+		fv := state.GetFvCache(pair)
 		score := DotProduct(weight, fv)
 		if score > bestScore {
 			bestPair = pair
@@ -164,7 +164,6 @@ func (model *Model) Update(gold *Sentence) {
 		allow := AllowedActions(state, goldArcs)
 		choice := BestActionIndexPair(&model.weight, state)
 		containChoice := false
-		//fmt.Println(choice)
 		for _, pair := range allow {
 			if pair.SameActionIndexPair(choice) {
 				containChoice = true
@@ -173,9 +172,9 @@ func (model *Model) Update(gold *Sentence) {
 		if containChoice {
 			choice.action(state, choice.index)
 		} else {
-			predFv, _ := ExtractFeatures(state, choice)
+			predFv := state.GetFvCache(choice)
 			good := BestAllowedActionIndexPair(&model.weight, state, allow)
-			goodFv, _ := ExtractFeatures(state, good)
+			goodFv := state.GetFvCache(good)
 			model.updateWeight(&goodFv, &predFv)
 		}
 		iter++
