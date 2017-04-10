@@ -12,7 +12,7 @@ func TestEdgeFor(t *testing.T) {
 		makeWord("hang", "NNP", 1, 0),
 		makeWord("plays", "VBZ", 2, 1),
 	)
-	s := &State{words, make(map[int]int)}
+	s := NewState(words)
 	pair, err := EdgeFor(s, 0, 0)
 	if err != nil {
 		t.Error("error should be nil")
@@ -29,8 +29,7 @@ func TestIsValidFalse(t *testing.T) {
 		makeWord("hang", "NNP", 1, 0),
 		makeWord("plays", "VBZ", 2, 1),
 	)
-
-	s := &State{words, make(map[int]int)}
+	s := NewState(words)
 	goldArcs := make(map[int][]int)
 	goldArcs[-1] = []int{0}
 	goldArcs[0] = []int{1}
@@ -50,7 +49,7 @@ func TestIsValidTrue(t *testing.T) {
 
 	arcs := make(map[int]int)
 	arcs[2] = 1
-	s := &State{words, arcs}
+	s := NewState(words)
 	goldArcs := make(map[int][]int)
 	goldArcs[-1] = []int{0}
 	goldArcs[0] = []int{1}
@@ -70,7 +69,7 @@ func TestAllowedActions(t *testing.T) {
 		makeWord("elianti", "NNP", 4, 3),
 		makeWord(".", ".", 5, 3),
 	)
-	s := &State{words, make(map[int]int)}
+	s := NewState(words)
 	AttachRight(s, 3)
 
 	goldArcs := make(map[int][]int)
@@ -93,7 +92,7 @@ func TestCandidateActions(t *testing.T) {
 		makeWord("elianti", "NNP", 4, 3),
 		makeWord(".", ".", 5, 3),
 	)
-	s := &State{words, make(map[int]int)}
+	s := NewState(words)
 
 	if 10 != len(CandidateActions(s)) {
 		t.Error("length of candidate actions must be 10")
