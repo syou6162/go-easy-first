@@ -184,3 +184,15 @@ func (model *Model) Update(gold *Sentence) {
 		}
 	}
 }
+
+// w_t - w_cum / t
+func (model *Model) AveragedWeight() map[string]float64 {
+	avg := make(map[string]float64)
+	for k, v := range model.weight {
+		avg[k] = v
+	}
+	for k, v := range model.cumWeight {
+		avg[k] = avg[k] - v/float64(model.count)
+	}
+	return avg
+}
