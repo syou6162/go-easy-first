@@ -19,5 +19,8 @@ func Decode(weight *map[string]float64, sent *Sentence) {
 	copy(tmp, sent.words)
 	s := NewState(sent.words)
 	decode(weight, s)
-	// arcsからheadを埋める
+
+	for child, parent := range s.arcs {
+		sent.words[child].predHead = parent
+	}
 }
