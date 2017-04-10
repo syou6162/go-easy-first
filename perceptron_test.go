@@ -47,9 +47,10 @@ func TestIsValidTrue(t *testing.T) {
 		makeWord("plays", "VBZ", 2, 1),
 	)
 
+	s := NewState(words)
 	arcs := make(map[int]int)
 	arcs[2] = 1
-	s := NewState(words)
+	s.arcs = arcs
 	goldArcs := make(map[int][]int)
 	goldArcs[-1] = []int{0}
 	goldArcs[0] = []int{1}
