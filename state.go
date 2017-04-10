@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"runtime"
 	"strconv"
+	"math"
 )
 
 type FvCache map[string][]string
@@ -42,6 +43,17 @@ func NewState(pending []*Word) *State {
 func (state *State) deletePending(idx int) []*Word {
 	state.pending = append(state.pending[:idx], state.pending[idx+1:]...)
 	return state.pending
+}
+
+func (state *State) ResetFvCache(index int) {
+	for _, f := range StateActions {
+		min := int(math.Max(0, float64(index - 2)))
+		max := int(math.Min(float64(len(state.pending)-1), float64(index + 2)))
+		for idx := min; idx < max; idx++ {
+			pair := ActionIndexPair{f, idx}
+			delete(state.fvCache, state.cacheKeyStr(pair))
+		}
+	}
 }
 
 func (state *State) GetFvCache(pair ActionIndexPair) []string {

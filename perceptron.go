@@ -171,6 +171,7 @@ func (model *Model) Update(gold *Sentence) {
 		}
 		if containChoice {
 			choice.action(state, choice.index)
+			state.ResetFvCache(choice.index)
 		} else {
 			predFv := state.GetFvCache(choice)
 			good := BestAllowedActionIndexPair(&model.weight, state, allow)
