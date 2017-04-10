@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math"
+	"reflect"
 )
 
 type Side int
@@ -58,7 +60,7 @@ func addBothHandFeatures(features *[]string, parent *Word, child *Word) {
 	)
 }
 
-func extractAttachLeftFeature(state *State, idx int) []string {
+func extractAttachLeftFeatures(state *State, idx int) []string {
 	features := make([]string, 0)
 	addLeftHandFeatures(&features, state, idx)
 	addRightHandFeatures(&features, state, idx)
@@ -68,7 +70,7 @@ func extractAttachLeftFeature(state *State, idx int) []string {
 	return features
 }
 
-func extractAttachRightFeature(state *State, idx int) []string {
+func extractAttachRightFeatures(state *State, idx int) []string {
 	features := make([]string, 0)
 	addLeftHandFeatures(&features, state, idx)
 	addRightHandFeatures(&features, state, idx)
@@ -76,4 +78,14 @@ func extractAttachRightFeature(state *State, idx int) []string {
 	child := state.pending[idx]
 	addBothHandFeatures(&features, parent, child)
 	return features
+}
+
+func ExtractFeatures(state *State, pair ActionIndexPair) ([]string, error) {
+	if reflect.ValueOf(pair.action).Pointer() == reflect.ValueOf(AttachLeft).Pointer() {
+		return extractAttachLeftFeatures(state, pair.index), nil
+	} else if reflect.ValueOf(pair.action).Pointer() == reflect.ValueOf(AttachRight).Pointer() {
+		return extractAttachRightFeatures(state, pair.index), nil
+	} else {
+		return nil, errors.New("wrong action")
+	}
 }

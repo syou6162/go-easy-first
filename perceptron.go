@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"math"
+	"reflect"
 )
 
 // GoldArcs returns map of parent => children
@@ -64,6 +65,11 @@ type ActionIndexPair struct {
 	index  int
 }
 
+func (pair1 ActionIndexPair) SameActionIndexPair(pair2 ActionIndexPair) bool {
+	return pair1.index == pair2.index &&
+		reflect.ValueOf(pair1.action).Pointer() == reflect.ValueOf(pair2.action).Pointer()
+}
+
 func AllowedActions(state *State, goldArcs map[int][]int) []ActionIndexPair {
 	result := make([]ActionIndexPair, 0)
 	for actionID, f := range StateActions {
@@ -93,23 +99,33 @@ func DotProduct(weight *map[string]float64, fv []string) float64 {
 			sum += v
 		}
 	}
-	return 0.0
+	return sum
 }
 
 func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPair {
 	bestScore := math.Inf(-1)
 	pairs := CandidateActions(state)
 	bestPair := pairs[0]
-	for pairIdx, pair := range pairs {
-		idx := pair.index
-		score := 0.0
-		if pairIdx%2 == 0 { // AttachLeft
-			score = DotProduct(weight, extractAttachLeftFeature(state, idx))
-		} else { // AttachRight
-			score = DotProduct(weight, extractAttachRightFeature(state, idx))
-		}
+	for _, pair := range pairs {
+		fv, _ := ExtractFeatures(state, pair)
+		score := DotProduct(weight, fv)
 		if score > bestScore {
 			bestPair = pair
+			bestScore = score
+		}
+	}
+	return bestPair
+}
+
+func BestAllowedActionIndexPair(weight *map[string]float64, state *State, pairs []ActionIndexPair) ActionIndexPair {
+	bestScore := math.Inf(-1)
+	bestPair := pairs[0]
+	for _, pair := range pairs {
+		fv, _ := ExtractFeatures(state, pair)
+		score := DotProduct(weight, fv)
+		if score > bestScore {
+			bestPair = pair
+			bestScore = score
 		}
 	}
 	return bestPair
@@ -135,4 +151,48 @@ func (model *Model) updateWeight(goldFeatureVector *[]string, predictFeatureVect
 		model.cumWeight[feat] = cumW - float64(model.count)
 	}
 	model.count += 1
+}
+
+func (model *Model) Update(gold *Sentence) {
+	state := NewState(gold.words)
+	goldArcs := GoldArcs(gold)
+	iter := 0
+	for {
+		if len(state.pending) <= 1 {
+			break
+		}
+		allow := AllowedActions(state, goldArcs)
+		choice := BestActionIndexPair(&model.weight, state)
+		containChoice := false
+		//fmt.Println(choice)
+		for _, pair := range allow {
+			if pair.SameActionIndexPair(choice) {
+				containChoice = true
+			}
+		}
+		if containChoice {
+			choice.action(state, choice.index)
+		} else {
+			predFv, _ := ExtractFeatures(state, choice)
+			good := BestAllowedActionIndexPair(&model.weight, state, allow)
+			goodFv, _ := ExtractFeatures(state, good)
+			model.updateWeight(&goodFv, &predFv)
+		}
+		iter++
+		if iter > 500 { // for infinite loop
+			break
+		}
+	}
+}
+
+// w_t - w_cum / t
+func (model *Model) AveragedWeight() map[string]float64 {
+	avg := make(map[string]float64)
+	for k, v := range model.weight {
+		avg[k] = v
+	}
+	for k, v := range model.cumWeight {
+		avg[k] = avg[k] - v/float64(model.count)
+	}
+	return avg
 }

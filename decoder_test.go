@@ -17,7 +17,7 @@ func TestDecode(t *testing.T) {
 	sent := Sentence{words: words}
 	weight := make(map[string]float64)
 
-	s := &State{sent.words, make(map[int]int)}
+	s := NewState(sent.words)
 	decode(&weight, s)
 	if len(s.arcs) == 0 {
 		t.Error("length of arcs must be greater than 0")

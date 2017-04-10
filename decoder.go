@@ -15,7 +15,12 @@ func decode(weight *map[string]float64, state *State) {
 }
 
 func Decode(weight *map[string]float64, sent *Sentence) {
-	s := &State{sent.words, make(map[int]int)}
+	tmp := make([]*Word, len(sent.words))
+	copy(tmp, sent.words)
+	s := NewState(sent.words)
 	decode(weight, s)
-	// arcsからheadを埋める
+
+	for child, parent := range s.arcs {
+		sent.words[child].predHead = parent
+	}
 }
