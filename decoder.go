@@ -10,6 +10,7 @@ func decode(weight *map[string]float64, state *State) {
 	} else {
 		pair := BestActionIndexPair(weight, state)
 		pair.action(state, pair.index)
+		state.ResetFvCache(pair.index)
 		decode(weight, state)
 	}
 }
