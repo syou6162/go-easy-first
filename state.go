@@ -47,8 +47,8 @@ func (state *State) deletePending(idx int) []*Word {
 
 func (state *State) ResetFvCache(index int) {
 	for _, f := range StateActions {
-		min := int(math.Max(0, float64(index-2)))
-		max := int(math.Min(float64(len(state.pending)-1), float64(index+2)))
+		min := int(math.Max(0, float64(index-3)))
+		max := int(math.Min(float64(len(state.pending)-1), float64(index+3)))
 		for idx := min; idx < max; idx++ {
 			pair := ActionIndexPair{f, idx}
 			delete(state.fvCache, state.cacheKeyStr(pair))
