@@ -7,28 +7,30 @@ import (
 	"reflect"
 )
 
-type Side int
+func NilSafePosTag(w *Word) string {
+	posTag := ""
+	if w != nil {
+		posTag = w.posTag
+	}
+	return posTag
+}
 
-const (
-	LEFT Side = iota
-	RIGHT
-)
-
-func addOneHandFeatures(features *[]string, w *Word, side Side) {
+func addOneHandFeatures(features *[]string, state *State, idx int, prefix string) {
+	if idx < 0 || idx >= len(state.pending) {
+		return
+	}
+	w := state.pending[idx]
+	lcp := NilSafePosTag(w.LeftMostChild())
+	rcp := NilSafePosTag(w.RightMostChild())
 	*features = append(*features,
-		fmt.Sprintf("side:%d+surface:%s", side, w.surface),
-		fmt.Sprintf("side:%d+lemma:%s", side, w.lemma),
-		fmt.Sprintf("side:%d+posTag:%s", side, w.posTag),
-		fmt.Sprintf("side:%d+cposTag:%s", side, w.cposTag),
+		fmt.Sprintf("side:%d+surface:%s", prefix, w.surface),
+		fmt.Sprintf("side:%d+lemma:%s", prefix, w.lemma),
+		fmt.Sprintf("side:%d+posTag:%s", prefix, w.posTag),
+		fmt.Sprintf("side:%d+cposTag:%s", prefix, w.cposTag),
+		fmt.Sprintf("side:%d+posTag:%s+leftmost:%s", prefix, w.posTag, lcp),
+		fmt.Sprintf("side:%d+posTag:%s+rightmost:%s", prefix, w.posTag, rcp),
+		fmt.Sprintf("side:%d+posTag:%s+leftmost:%s+rightmost:%s", prefix, w.posTag, lcp, rcp),
 	)
-}
-
-func addLeftHandFeatures(features *[]string, state *State, idx int) {
-	addOneHandFeatures(features, state.pending[idx], LEFT)
-}
-
-func addRightHandFeatures(features *[]string, state *State, idx int) {
-	addOneHandFeatures(features, state.pending[idx+1], RIGHT)
 }
 
 func distStr(dist int) string {
@@ -62,8 +64,12 @@ func addBothHandFeatures(features *[]string, parent *Word, child *Word) {
 
 func extractAttachLeftFeatures(state *State, idx int) []string {
 	features := make([]string, 0)
-	addLeftHandFeatures(&features, state, idx)
-	addRightHandFeatures(&features, state, idx)
+	addOneHandFeatures(&features, state, idx-2, "p_i-2")
+	addOneHandFeatures(&features, state, idx-1, "p_i-1")
+	addOneHandFeatures(&features, state, idx, "p_i")
+	addOneHandFeatures(&features, state, idx+1, "p_i+1")
+	addOneHandFeatures(&features, state, idx+2, "p_i+2")
+	addOneHandFeatures(&features, state, idx+3, "p_i+3")
 	parent := state.pending[idx]
 	child := state.pending[idx+1]
 	addBothHandFeatures(&features, parent, child)
@@ -72,8 +78,12 @@ func extractAttachLeftFeatures(state *State, idx int) []string {
 
 func extractAttachRightFeatures(state *State, idx int) []string {
 	features := make([]string, 0)
-	addLeftHandFeatures(&features, state, idx)
-	addRightHandFeatures(&features, state, idx)
+	addOneHandFeatures(&features, state, idx-2, "p_i-2")
+	addOneHandFeatures(&features, state, idx-1, "p_i-1")
+	addOneHandFeatures(&features, state, idx, "p_i")
+	addOneHandFeatures(&features, state, idx+1, "p_i+1")
+	addOneHandFeatures(&features, state, idx+2, "p_i+2")
+	addOneHandFeatures(&features, state, idx+3, "p_i+3")
 	parent := state.pending[idx+1]
 	child := state.pending[idx]
 	addBothHandFeatures(&features, parent, child)
