@@ -96,10 +96,10 @@ func AddUnigramFeatures(features *[]string, state *State, actName string, idx in
 func extractFeatures(state *State, actName string, idx int) []string {
 	features := make([]string, 0)
 	AddUnigramFeatures(&features, state, actName, idx)
-	p0 := NilSafePendingWord(state, idx - 1)
+	p0 := NilSafePendingWord(state, idx-1)
 	p1 := NilSafePendingWord(state, idx)
-	p2 := NilSafePendingWord(state, idx + 1)
-	p3 := NilSafePendingWord(state, idx + 2)
+	p2 := NilSafePendingWord(state, idx+1)
+	p3 := NilSafePendingWord(state, idx+2)
 	AddBigramFeatures(&features, actName, p1, p2, "p_i+p_{i+1}")
 	AddBigramFeatures(&features, actName, p1, p3, "p_i+p_{i+2}")
 	AddBigramFeatures(&features, actName, p0, p1, "p_{i-1}+p_i")
