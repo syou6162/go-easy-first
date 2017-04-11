@@ -28,3 +28,19 @@ func (word *Word) prependChild(c *Word) []*Word {
 	word.children = append([]*Word{c}, word.children...)
 	return word.children
 }
+
+func (word *Word) LeftMostChild() *Word {
+	if len(word.children) == 0 {
+		return nil
+	} else {
+		return word.children[0]
+	}
+}
+
+func (word *Word) RightMostChild() *Word {
+	if len(word.children) == 0 {
+		return nil
+	} else {
+		return word.children[len(word.children)-1]
+	}
+}
