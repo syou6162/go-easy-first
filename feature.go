@@ -15,6 +15,14 @@ func NilSafePosTag(w *Word) string {
 	return posTag
 }
 
+func NilSafePendingWord(state *State, idx int) *Word {
+	if idx < 0 || idx >= len(state.pending) {
+		return nil
+	} else {
+		return state.pending[idx]
+	}
+}
+
 func addUnigramFeatures(features *[]string, state *State, actName string, idx int, prefix string) {
 	if idx < 0 || idx >= len(state.pending) {
 		return
@@ -50,7 +58,7 @@ func distStr(dist int) string {
 	return d
 }
 
-func AddBigramFeatures(features *[]string, actName string, parent *Word, child *Word) {
+func AddBigramFeatures(features *[]string, actName string, parent *Word, child *Word, prefix string) {
 	if parent == nil || child == nil {
 		return
 	}
@@ -62,17 +70,17 @@ func AddBigramFeatures(features *[]string, actName string, parent *Word, child *
 	dist := int(math.Abs(float64(parent.idx - child.idx)))
 
 	*features = append(*features,
-		fmt.Sprintf("%s+parent-surface:%s+child-surface:%s", actName, parent.surface, child.surface),
-		fmt.Sprintf("%s+parent-surface:%s+child-posTag:%s", actName, parent.surface, child.posTag),
-		fmt.Sprintf("%s+parent-posTag:%s+child-surface:%s", actName, parent.posTag, child.surface),
-		fmt.Sprintf("%s+parent-lemma:%s+child-lemma:%s", actName, parent.lemma, child.lemma),
-		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s", actName, parent.posTag, child.posTag),
-		fmt.Sprintf("%s+parent-cposTag:%s+child-cposTag:%s", actName, parent.cposTag, child.cposTag),
-		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s+plcp:%s+prcp:%s", actName, parent.posTag, child.posTag, plcp, prcp),
-		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s+plcp:%s+crcp:%s", actName, parent.posTag, child.posTag, plcp, crcp),
-		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s+clcp:%s+prcp:%s", actName, parent.posTag, child.posTag, clcp, prcp),
-		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s+clcp:%s+crcp:%s", actName, parent.posTag, child.posTag, clcp, crcp),
-		fmt.Sprintf("dist:%s", distStr(dist)),
+		fmt.Sprintf("%s+%s+parent-surface:%s+child-surface:%s", actName, prefix, parent.surface, child.surface),
+		fmt.Sprintf("%s+%s+parent-surface:%s+child-posTag:%s", actName, prefix, parent.surface, child.posTag),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-surface:%s", actName, prefix, parent.posTag, child.surface),
+		fmt.Sprintf("%s+%s+parent-lemma:%s+child-lemma:%s", actName, prefix, parent.lemma, child.lemma),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s", actName, prefix, parent.posTag, child.posTag),
+		fmt.Sprintf("%s+%s+parent-cposTag:%s+child-cposTag:%s", actName, prefix, parent.cposTag, child.cposTag),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+plcp:%s+prcp:%s", actName, prefix, parent.posTag, child.posTag, plcp, prcp),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+plcp:%s+crcp:%s", actName, prefix, parent.posTag, child.posTag, plcp, crcp),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+clcp:%s+prcp:%s", actName, prefix, parent.posTag, child.posTag, clcp, prcp),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+clcp:%s+crcp:%s", actName, prefix, parent.posTag, child.posTag, clcp, crcp),
+		fmt.Sprintf("%s+%s+dist:%s", actName, prefix, distStr(dist)),
 	)
 }
 
@@ -88,9 +96,15 @@ func AddUnigramFeatures(features *[]string, state *State, actName string, idx in
 func extractFeatures(state *State, actName string, idx int) []string {
 	features := make([]string, 0)
 	AddUnigramFeatures(&features, state, actName, idx)
-	parent := state.pending[idx]
-	child := state.pending[idx+1]
-	AddBigramFeatures(&features, actName, parent, child)
+	p0 := NilSafePendingWord(state, idx - 1)
+	p1 := NilSafePendingWord(state, idx)
+	p2 := NilSafePendingWord(state, idx + 1)
+	p3 := NilSafePendingWord(state, idx + 2)
+	AddBigramFeatures(&features, actName, p1, p2, "p_i+p_{i+1}")
+	AddBigramFeatures(&features, actName, p1, p3, "p_i+p_{i+2}")
+	AddBigramFeatures(&features, actName, p0, p1, "p_{i-1}+p_i")
+	AddBigramFeatures(&features, actName, p0, p3, "p_{i-1}+p_{i+2}")
+	AddBigramFeatures(&features, actName, p2, p3, "p_{i+1}+p_{i+2}")
 	return features
 }
 
