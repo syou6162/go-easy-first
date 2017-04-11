@@ -50,7 +50,7 @@ func distStr(dist int) string {
 	return d
 }
 
-func addBothHandFeatures(features *[]string, parent *Word, child *Word) {
+func addBothHandFeatures(features *[]string, actName string, parent *Word, child *Word) {
 	plcp := NilSafePosTag(parent.LeftMostChild())
 	prcp := NilSafePosTag(parent.RightMostChild())
 	clcp := NilSafePosTag(child.LeftMostChild())
@@ -58,16 +58,16 @@ func addBothHandFeatures(features *[]string, parent *Word, child *Word) {
 	dist := int(math.Abs(float64(parent.idx - child.idx)))
 
 	*features = append(*features,
-		fmt.Sprintf("parent-surface:%s+child-surface:%s", parent.surface, child.surface),
-		fmt.Sprintf("parent-surface:%s+child-posTag:%s", parent.surface, child.posTag),
-		fmt.Sprintf("parent-posTag:%s+child-surface:%s", parent.posTag, child.surface),
-		fmt.Sprintf("parent-lemma:%s+child-lemma:%s", parent.lemma, child.lemma),
-		fmt.Sprintf("parent-posTag:%s+child-posTag:%s", parent.posTag, child.posTag),
-		fmt.Sprintf("parent-cposTag:%s+child-cposTag:%s", parent.cposTag, child.cposTag),
-		fmt.Sprintf("parent-posTag:%s+child-posTag:%s+plcp:%s+prcp:%s", parent.posTag, child.posTag, plcp, prcp),
-		fmt.Sprintf("parent-posTag:%s+child-posTag:%s+plcp:%s+crcp:%s", parent.posTag, child.posTag, plcp, crcp),
-		fmt.Sprintf("parent-posTag:%s+child-posTag:%s+clcp:%s+prcp:%s", parent.posTag, child.posTag, clcp, prcp),
-		fmt.Sprintf("parent-posTag:%s+child-posTag:%s+clcp:%s+crcp:%s", parent.posTag, child.posTag, clcp, crcp),
+		fmt.Sprintf("%s+parent-surface:%s+child-surface:%s", actName, parent.surface, child.surface),
+		fmt.Sprintf("%s+parent-surface:%s+child-posTag:%s", actName, parent.surface, child.posTag),
+		fmt.Sprintf("%s+parent-posTag:%s+child-surface:%s", actName, parent.posTag, child.surface),
+		fmt.Sprintf("%s+parent-lemma:%s+child-lemma:%s", actName, parent.lemma, child.lemma),
+		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s", actName, parent.posTag, child.posTag),
+		fmt.Sprintf("%s+parent-cposTag:%s+child-cposTag:%s", actName, parent.cposTag, child.cposTag),
+		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s+plcp:%s+prcp:%s", actName, parent.posTag, child.posTag, plcp, prcp),
+		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s+plcp:%s+crcp:%s", actName, parent.posTag, child.posTag, plcp, crcp),
+		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s+clcp:%s+prcp:%s", actName, parent.posTag, child.posTag, clcp, prcp),
+		fmt.Sprintf("%s+parent-posTag:%s+child-posTag:%s+clcp:%s+crcp:%s", actName, parent.posTag, child.posTag, clcp, crcp),
 		fmt.Sprintf("dist:%s", distStr(dist)),
 	)
 }
@@ -86,7 +86,7 @@ func extractFeatures(state *State, actName string, idx int) []string {
 	AddUnigramFeatures(&features, state, actName, idx)
 	parent := state.pending[idx]
 	child := state.pending[idx+1]
-	addBothHandFeatures(&features, parent, child)
+	addBothHandFeatures(&features, actName, parent, child)
 	return features
 }
 
