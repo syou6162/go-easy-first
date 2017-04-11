@@ -50,7 +50,7 @@ func distStr(dist int) string {
 	return d
 }
 
-func addBothHandFeatures(features *[]string, actName string, parent *Word, child *Word) {
+func AddBigramFeatures(features *[]string, actName string, parent *Word, child *Word) {
 	plcp := NilSafePosTag(parent.LeftMostChild())
 	prcp := NilSafePosTag(parent.RightMostChild())
 	clcp := NilSafePosTag(child.LeftMostChild())
@@ -86,7 +86,7 @@ func extractFeatures(state *State, actName string, idx int) []string {
 	AddUnigramFeatures(&features, state, actName, idx)
 	parent := state.pending[idx]
 	child := state.pending[idx+1]
-	addBothHandFeatures(&features, actName, parent, child)
+	AddBigramFeatures(&features, actName, parent, child)
 	return features
 }
 
