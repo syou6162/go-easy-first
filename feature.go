@@ -51,6 +51,10 @@ func distStr(dist int) string {
 }
 
 func AddBigramFeatures(features *[]string, actName string, parent *Word, child *Word) {
+	if parent == nil || child == nil {
+		return
+	}
+
 	plcp := NilSafePosTag(parent.LeftMostChild())
 	prcp := NilSafePosTag(parent.RightMostChild())
 	clcp := NilSafePosTag(child.LeftMostChild())
