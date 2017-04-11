@@ -3,8 +3,17 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 )
+
+func shuffle(data []*Sentence) {
+	n := len(data)
+	for i := n - 1; i >= 0; i-- {
+		j := rand.Intn(i + 1)
+		data[i], data[j] = data[j], data[i]
+	}
+}
 
 func main() {
 	data, err := ioutil.ReadAll(os.Stdin)
@@ -12,7 +21,6 @@ func main() {
 		panic(err)
 	}
 
-	goldHeads := make([][]int, 0)
 	sentences := make([]*Sentence, 0)
 	for _, sent := range splitBySentence(string(data)) {
 		s, err := makeSentence(sent)
@@ -22,13 +30,15 @@ func main() {
 		sentences = append(sentences, s)
 	}
 
-	for _, sent := range sentences {
-		goldHeads = append(goldHeads, sent.ExtractHeads())
-	}
-
 	model := Model{make(map[string]float64), make(map[string]float64), 1}
 
 	for iter := 0; iter < 10; iter++ {
+		shuffle(sentences)
+		goldHeads := make([][]int, 0)
+		for _, sent := range sentences {
+			goldHeads = append(goldHeads, sent.ExtractHeads())
+		}
+
 		for _, sent := range sentences {
 			model.Update(sent)
 		}
