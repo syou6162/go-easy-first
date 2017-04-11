@@ -23,13 +23,13 @@ func addOneHandFeatures(features *[]string, state *State, idx int, prefix string
 	lcp := NilSafePosTag(w.LeftMostChild())
 	rcp := NilSafePosTag(w.RightMostChild())
 	*features = append(*features,
-		fmt.Sprintf("side:%d+surface:%s", prefix, w.surface),
-		fmt.Sprintf("side:%d+lemma:%s", prefix, w.lemma),
-		fmt.Sprintf("side:%d+posTag:%s", prefix, w.posTag),
-		fmt.Sprintf("side:%d+cposTag:%s", prefix, w.cposTag),
-		fmt.Sprintf("side:%d+posTag:%s+leftmost:%s", prefix, w.posTag, lcp),
-		fmt.Sprintf("side:%d+posTag:%s+rightmost:%s", prefix, w.posTag, rcp),
-		fmt.Sprintf("side:%d+posTag:%s+leftmost:%s+rightmost:%s", prefix, w.posTag, lcp, rcp),
+		fmt.Sprintf("%s+surface:%s", prefix, w.surface),
+		fmt.Sprintf("%s+lemma:%s", prefix, w.lemma),
+		fmt.Sprintf("%s+posTag:%s", prefix, w.posTag),
+		fmt.Sprintf("%s+cposTag:%s", prefix, w.cposTag),
+		fmt.Sprintf("%s+posTag:%s+leftmost:%s", prefix, w.posTag, lcp),
+		fmt.Sprintf("%s+posTag:%s+rightmost:%s", prefix, w.posTag, rcp),
+		fmt.Sprintf("%s+posTag:%s+leftmost:%s+rightmost:%s", prefix, w.posTag, lcp, rcp),
 	)
 }
 
