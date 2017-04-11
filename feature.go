@@ -15,7 +15,7 @@ func NilSafePosTag(w *Word) string {
 	return posTag
 }
 
-func addOneHandFeatures(features *[]string, state *State, idx int, prefix string) {
+func addUnigramFeatures(features *[]string, state *State, idx int, prefix string) {
 	if idx < 0 || idx >= len(state.pending) {
 		return
 	}
@@ -74,12 +74,12 @@ func addBothHandFeatures(features *[]string, parent *Word, child *Word) {
 
 func extractAttachLeftFeatures(state *State, idx int) []string {
 	features := make([]string, 0)
-	addOneHandFeatures(&features, state, idx-2, "p_i-2")
-	addOneHandFeatures(&features, state, idx-1, "p_i-1")
-	addOneHandFeatures(&features, state, idx, "p_i")
-	addOneHandFeatures(&features, state, idx+1, "p_i+1")
-	addOneHandFeatures(&features, state, idx+2, "p_i+2")
-	addOneHandFeatures(&features, state, idx+3, "p_i+3")
+	addUnigramFeatures(&features, state, idx-2, "p_i-2")
+	addUnigramFeatures(&features, state, idx-1, "p_i-1")
+	addUnigramFeatures(&features, state, idx, "p_i")
+	addUnigramFeatures(&features, state, idx+1, "p_i+1")
+	addUnigramFeatures(&features, state, idx+2, "p_i+2")
+	addUnigramFeatures(&features, state, idx+3, "p_i+3")
 	parent := state.pending[idx]
 	child := state.pending[idx+1]
 	addBothHandFeatures(&features, parent, child)
@@ -88,12 +88,12 @@ func extractAttachLeftFeatures(state *State, idx int) []string {
 
 func extractAttachRightFeatures(state *State, idx int) []string {
 	features := make([]string, 0)
-	addOneHandFeatures(&features, state, idx-2, "p_i-2")
-	addOneHandFeatures(&features, state, idx-1, "p_i-1")
-	addOneHandFeatures(&features, state, idx, "p_i")
-	addOneHandFeatures(&features, state, idx+1, "p_i+1")
-	addOneHandFeatures(&features, state, idx+2, "p_i+2")
-	addOneHandFeatures(&features, state, idx+3, "p_i+3")
+	addUnigramFeatures(&features, state, idx-2, "p_i-2")
+	addUnigramFeatures(&features, state, idx-1, "p_i-1")
+	addUnigramFeatures(&features, state, idx, "p_i")
+	addUnigramFeatures(&features, state, idx+1, "p_i+1")
+	addUnigramFeatures(&features, state, idx+2, "p_i+2")
+	addUnigramFeatures(&features, state, idx+3, "p_i+3")
 	parent := state.pending[idx+1]
 	child := state.pending[idx]
 	addBothHandFeatures(&features, parent, child)

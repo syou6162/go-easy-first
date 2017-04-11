@@ -16,7 +16,7 @@ func TestAddOneHandFeatures(t *testing.T) {
 	)
 	s := NewState(words)
 	features := make([]string, 0)
-	addOneHandFeatures(&features, s, 1, "p_i")
+	addUnigramFeatures(&features, s, 1, "p_i")
 
 	if len(features) == 0 {
 		t.Error("length of features must be greater than 0")
