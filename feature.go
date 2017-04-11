@@ -51,13 +51,23 @@ func distStr(dist int) string {
 }
 
 func addBothHandFeatures(features *[]string, parent *Word, child *Word) {
+	plcp := NilSafePosTag(parent.LeftMostChild())
+	prcp := NilSafePosTag(parent.RightMostChild())
+	clcp := NilSafePosTag(child.LeftMostChild())
+	crcp := NilSafePosTag(child.RightMostChild())
 	dist := int(math.Abs(float64(parent.idx - child.idx)))
 
 	*features = append(*features,
 		fmt.Sprintf("parent-surface:%s+child-surface:%s", parent.surface, child.surface),
+		fmt.Sprintf("parent-surface:%s+child-posTag:%s", parent.surface, child.posTag),
+		fmt.Sprintf("parent-posTag:%s+child-surface:%s", parent.posTag, child.surface),
 		fmt.Sprintf("parent-lemma:%s+child-lemma:%s", parent.lemma, child.lemma),
 		fmt.Sprintf("parent-posTag:%s+child-posTag:%s", parent.posTag, child.posTag),
 		fmt.Sprintf("parent-cposTag:%s+child-cposTag:%s", parent.cposTag, child.cposTag),
+		fmt.Sprintf("parent-posTag:%s+child-posTag:%s+plcp:%s+prcp:%s", parent.posTag, child.posTag, plcp, prcp),
+		fmt.Sprintf("parent-posTag:%s+child-posTag:%s+plcp:%s+crcp:%s", parent.posTag, child.posTag, plcp, crcp),
+		fmt.Sprintf("parent-posTag:%s+child-posTag:%s+clcp:%s+prcp:%s", parent.posTag, child.posTag, clcp, prcp),
+		fmt.Sprintf("parent-posTag:%s+child-posTag:%s+clcp:%s+crcp:%s", parent.posTag, child.posTag, clcp, crcp),
 		fmt.Sprintf("dist:%s", distStr(dist)),
 	)
 }
