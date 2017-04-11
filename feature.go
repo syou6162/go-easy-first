@@ -72,14 +72,20 @@ func addBothHandFeatures(features *[]string, parent *Word, child *Word) {
 	)
 }
 
+
+func AddUnigramFeatures(features *[]string, state *State, idx int) {
+	addUnigramFeatures(features, state, idx-2, "p_i-2")
+	addUnigramFeatures(features, state, idx-1, "p_i-1")
+	addUnigramFeatures(features, state, idx, "p_i")
+	addUnigramFeatures(features, state, idx+1, "p_i+1")
+	addUnigramFeatures(features, state, idx+2, "p_i+2")
+	addUnigramFeatures(features, state, idx+3, "p_i+3")
+}
+
+
 func extractAttachLeftFeatures(state *State, idx int) []string {
 	features := make([]string, 0)
-	addUnigramFeatures(&features, state, idx-2, "p_i-2")
-	addUnigramFeatures(&features, state, idx-1, "p_i-1")
-	addUnigramFeatures(&features, state, idx, "p_i")
-	addUnigramFeatures(&features, state, idx+1, "p_i+1")
-	addUnigramFeatures(&features, state, idx+2, "p_i+2")
-	addUnigramFeatures(&features, state, idx+3, "p_i+3")
+	AddUnigramFeatures(&features, state, idx)
 	parent := state.pending[idx]
 	child := state.pending[idx+1]
 	addBothHandFeatures(&features, parent, child)
@@ -88,12 +94,7 @@ func extractAttachLeftFeatures(state *State, idx int) []string {
 
 func extractAttachRightFeatures(state *State, idx int) []string {
 	features := make([]string, 0)
-	addUnigramFeatures(&features, state, idx-2, "p_i-2")
-	addUnigramFeatures(&features, state, idx-1, "p_i-1")
-	addUnigramFeatures(&features, state, idx, "p_i")
-	addUnigramFeatures(&features, state, idx+1, "p_i+1")
-	addUnigramFeatures(&features, state, idx+2, "p_i+2")
-	addUnigramFeatures(&features, state, idx+3, "p_i+3")
+	AddUnigramFeatures(&features, state, idx)
 	parent := state.pending[idx+1]
 	child := state.pending[idx]
 	addBothHandFeatures(&features, parent, child)
