@@ -13,11 +13,6 @@ func TestAddOneHandFeatures(t *testing.T) {
 	if len(features) == 0 {
 		t.Error("length of features must be greater than 0")
 	}
-
-	rightFeatures := []string{"side:1+surface:plays", "side:1+lemma:plays", "side:1+posTag:VBZ", "side:1+cposTag:VBZ"}
-	if !reflect.DeepEqual(features, rightFeatures) {
-		t.Error("feature extraction seems wrong")
-	}
 }
 
 func TestExtractAttachLeftFeature(t *testing.T) {
