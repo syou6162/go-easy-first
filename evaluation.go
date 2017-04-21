@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"sync"
 )
 
 func dependencyAccuracy(golds [][]int, predictions [][]int) (float64, error) {
@@ -26,6 +27,7 @@ func dependencyAccuracy(golds [][]int, predictions [][]int) (float64, error) {
 }
 
 func DependencyAccuracy(model *Model, sents []*Sentence) float64 {
+	wg := &sync.WaitGroup{}
 	goldHeads := make([][]int, 0)
 	for _, sent := range sents {
 		goldHeads = append(goldHeads, sent.ExtractHeads())
@@ -33,8 +35,17 @@ func DependencyAccuracy(model *Model, sents []*Sentence) float64 {
 
 	predHeads := make([][]int, 0)
 	w := model.AveragedWeight()
+
 	for _, sent := range sents {
-		Decode(&w, sent)
+		wg.Add(1)
+		go func(sent *Sentence) {
+			defer wg.Done()
+			Decode(&w, sent)
+		}(sent)
+	}
+	wg.Wait()
+
+	for _, sent := range sents {
 		predHeads = append(predHeads, sent.ExtractPredictedHeads())
 	}
 	accuracy, _ := dependencyAccuracy(goldHeads, predHeads)
