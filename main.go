@@ -30,15 +30,9 @@ func main() {
 		sentences = append(sentences, s)
 	}
 
-	goldSents := make([]*Sentence, 0)
-	devSents := make([]*Sentence, 0)
-	for i := 0; i < len(sentences) - 1; i++ {
-		if i < int(float64(len(sentences)) * 0.8) {
-			goldSents = append(goldSents, sentences[i])
-		} else {
-			devSents = append(devSents, sentences[i])
-		}
-	}
+	splitPos := int(float64(len(sentences)) * 0.8)
+	goldSents := sentences[0:splitPos]
+	devSents := sentences[splitPos+1:len(sentences)-1]
 
 	model := Model{make(map[string]float64), make(map[string]float64), 1}
 
