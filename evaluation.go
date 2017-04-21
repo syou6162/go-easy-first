@@ -40,5 +40,3 @@ func DependencyAccuracy(model *Model, sents []*Sentence) float64 {
 	accuracy, _ := dependencyAccuracy(goldHeads, predHeads)
 	return accuracy
 }
-
-

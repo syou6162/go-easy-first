@@ -32,7 +32,7 @@ func main() {
 
 	splitPos := int(float64(len(sentences)) * 0.8)
 	goldSents := sentences[0:splitPos]
-	devSents := sentences[splitPos+1:len(sentences)-1]
+	devSents := sentences[splitPos+1 : len(sentences)-1]
 
 	model := Model{make(map[string]float64), make(map[string]float64), 1}
 
