@@ -67,7 +67,6 @@ func AddBigramFeatures(features *[]string, actName string, parent *Word, child *
 	prcp := NilSafePosTag(parent.RightMostChild())
 	clcp := NilSafePosTag(child.LeftMostChild())
 	crcp := NilSafePosTag(child.RightMostChild())
-	dist := int(math.Abs(float64(parent.idx - child.idx)))
 
 	*features = append(*features,
 		fmt.Sprintf("%s+%s+parent-surface:%s+child-surface:%s", actName, prefix, parent.surface, child.surface),
@@ -80,7 +79,6 @@ func AddBigramFeatures(features *[]string, actName string, parent *Word, child *
 		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+plcp:%s+crcp:%s", actName, prefix, parent.posTag, child.posTag, plcp, crcp),
 		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+clcp:%s+prcp:%s", actName, prefix, parent.posTag, child.posTag, clcp, prcp),
 		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+clcp:%s+crcp:%s", actName, prefix, parent.posTag, child.posTag, clcp, crcp),
-		fmt.Sprintf("%s+%s+dist:%s", actName, prefix, distStr(dist)),
 	)
 }
 
@@ -93,18 +91,64 @@ func AddUnigramFeatures(features *[]string, state *State, actName string, idx in
 	addUnigramFeatures(features, state, actName, idx+3, "p_i+3")
 }
 
+func hasNoChildren(w *Word) bool {
+	return len(w.children) == 0
+}
+
+func addStructuralSingleFeatures(features *[]string, state *State, actName string, idx int, prefix string) {
+	if idx < 0 || idx >= len(state.pending) {
+		return
+	}
+	w := state.pending[idx]
+	*features = append(*features,
+		fmt.Sprintf("%s+%s+len:%d", actName, prefix, len(w.children)),
+		fmt.Sprintf("%s+%s+no-children:%t", actName, prefix, hasNoChildren(w)),
+	)
+}
+
+func AddStructuralSingleFeatures(features *[]string, state *State, actName string, idx int) {
+	addStructuralSingleFeatures(features, state, actName, idx-2, "p_i-2")
+	addStructuralSingleFeatures(features, state, actName, idx-1, "p_i-1")
+	addStructuralSingleFeatures(features, state, actName, idx, "p_i")
+	addStructuralSingleFeatures(features, state, actName, idx+1, "p_i+1")
+	addStructuralSingleFeatures(features, state, actName, idx+2, "p_i+2")
+	addStructuralSingleFeatures(features, state, actName, idx+3, "p_i+3")
+}
+
+func addStructuralPairFeatures(features *[]string, actName string, left *Word, right *Word, prefix string) {
+	if left == nil || right == nil {
+		return
+	}
+	dist := int(math.Abs(float64(left.idx - right.idx)))
+
+	*features = append(*features,
+		fmt.Sprintf("%s+%s+dist:%s", actName, prefix, distStr(dist)),
+		fmt.Sprintf("%s+%s+dist:%s+leftPos:%s+rightPos:%s", actName, prefix, distStr(dist), left.posTag, right.posTag),
+	)
+}
+
 func extractFeatures(state *State, actName string, idx int) []string {
 	features := make([]string, 0)
 	AddUnigramFeatures(&features, state, actName, idx)
+	AddStructuralSingleFeatures(&features, state, actName, idx)
+
 	p0 := NilSafePendingWord(state, idx-1)
 	p1 := NilSafePendingWord(state, idx)
 	p2 := NilSafePendingWord(state, idx+1)
 	p3 := NilSafePendingWord(state, idx+2)
+
 	AddBigramFeatures(&features, actName, p1, p2, "p_i+p_{i+1}")
 	AddBigramFeatures(&features, actName, p1, p3, "p_i+p_{i+2}")
 	AddBigramFeatures(&features, actName, p0, p1, "p_{i-1}+p_i")
 	AddBigramFeatures(&features, actName, p0, p3, "p_{i-1}+p_{i+2}")
 	AddBigramFeatures(&features, actName, p2, p3, "p_{i+1}+p_{i+2}")
+
+	addStructuralPairFeatures(&features, actName, p1, p2, "p_i+p_{i+1}")
+	addStructuralPairFeatures(&features, actName, p1, p3, "p_i+p_{i+2}")
+	addStructuralPairFeatures(&features, actName, p0, p1, "p_{i-1}+p_i")
+	addStructuralPairFeatures(&features, actName, p0, p3, "p_{i-1}+p_{i+2}")
+	addStructuralPairFeatures(&features, actName, p2, p3, "p_{i+1}+p_{i+2}")
+
 	return features
 }
 
