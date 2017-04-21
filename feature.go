@@ -1,34 +1,44 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"reflect"
+	"runtime"
 )
 
-type Side int
+func NilSafePosTag(w *Word) string {
+	posTag := ""
+	if w != nil {
+		posTag = w.posTag
+	}
+	return posTag
+}
 
-const (
-	LEFT Side = iota
-	RIGHT
-)
+func NilSafePendingWord(state *State, idx int) *Word {
+	if idx < 0 || idx >= len(state.pending) {
+		return nil
+	} else {
+		return state.pending[idx]
+	}
+}
 
-func addOneHandFeatures(features *[]string, w *Word, side Side) {
+func addUnigramFeatures(features *[]string, state *State, actName string, idx int, prefix string) {
+	if idx < 0 || idx >= len(state.pending) {
+		return
+	}
+	w := state.pending[idx]
+	lcp := NilSafePosTag(w.LeftMostChild())
+	rcp := NilSafePosTag(w.RightMostChild())
 	*features = append(*features,
-		fmt.Sprintf("side:%d+surface:%s", side, w.surface),
-		fmt.Sprintf("side:%d+lemma:%s", side, w.lemma),
-		fmt.Sprintf("side:%d+posTag:%s", side, w.posTag),
-		fmt.Sprintf("side:%d+cposTag:%s", side, w.cposTag),
+		fmt.Sprintf("%s+%s+surface:%s", actName, prefix, w.surface),
+		fmt.Sprintf("%s+%s+lemma:%s", actName, prefix, w.lemma),
+		fmt.Sprintf("%s+%s+posTag:%s", actName, prefix, w.posTag),
+		fmt.Sprintf("%s+%s+cposTag:%s", actName, prefix, w.cposTag),
+		fmt.Sprintf("%s+%s+posTag:%s+leftmost:%s", actName, prefix, w.posTag, lcp),
+		fmt.Sprintf("%s+%s+posTag:%s+rightmost:%s", actName, prefix, w.posTag, rcp),
+		fmt.Sprintf("%s+%s+posTag:%s+leftmost:%s+rightmost:%s", actName, prefix, w.posTag, lcp, rcp),
 	)
-}
-
-func addLeftHandFeatures(features *[]string, state *State, idx int) {
-	addOneHandFeatures(features, state.pending[idx], LEFT)
-}
-
-func addRightHandFeatures(features *[]string, state *State, idx int) {
-	addOneHandFeatures(features, state.pending[idx+1], RIGHT)
 }
 
 func distStr(dist int) string {
@@ -48,44 +58,101 @@ func distStr(dist int) string {
 	return d
 }
 
-func addBothHandFeatures(features *[]string, parent *Word, child *Word) {
-	dist := int(math.Abs(float64(parent.idx - child.idx)))
+func AddBigramFeatures(features *[]string, actName string, parent *Word, child *Word, prefix string) {
+	if parent == nil || child == nil {
+		return
+	}
+
+	plcp := NilSafePosTag(parent.LeftMostChild())
+	prcp := NilSafePosTag(parent.RightMostChild())
+	clcp := NilSafePosTag(child.LeftMostChild())
+	crcp := NilSafePosTag(child.RightMostChild())
 
 	*features = append(*features,
-		fmt.Sprintf("parent-surface:%s+child-surface:%s", parent.surface, child.surface),
-		fmt.Sprintf("parent-lemma:%s+child-lemma:%s", parent.lemma, child.lemma),
-		fmt.Sprintf("parent-posTag:%s+child-posTag:%s", parent.posTag, child.posTag),
-		fmt.Sprintf("parent-cposTag:%s+child-cposTag:%s", parent.cposTag, child.cposTag),
-		fmt.Sprintf("dist:%s", distStr(dist)),
+		fmt.Sprintf("%s+%s+parent-surface:%s+child-surface:%s", actName, prefix, parent.surface, child.surface),
+		fmt.Sprintf("%s+%s+parent-surface:%s+child-posTag:%s", actName, prefix, parent.surface, child.posTag),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-surface:%s", actName, prefix, parent.posTag, child.surface),
+		fmt.Sprintf("%s+%s+parent-lemma:%s+child-lemma:%s", actName, prefix, parent.lemma, child.lemma),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s", actName, prefix, parent.posTag, child.posTag),
+		fmt.Sprintf("%s+%s+parent-cposTag:%s+child-cposTag:%s", actName, prefix, parent.cposTag, child.cposTag),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+plcp:%s+prcp:%s", actName, prefix, parent.posTag, child.posTag, plcp, prcp),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+plcp:%s+crcp:%s", actName, prefix, parent.posTag, child.posTag, plcp, crcp),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+clcp:%s+prcp:%s", actName, prefix, parent.posTag, child.posTag, clcp, prcp),
+		fmt.Sprintf("%s+%s+parent-posTag:%s+child-posTag:%s+clcp:%s+crcp:%s", actName, prefix, parent.posTag, child.posTag, clcp, crcp),
 	)
 }
 
-func extractAttachLeftFeatures(state *State, idx int) []string {
-	features := make([]string, 0)
-	addLeftHandFeatures(&features, state, idx)
-	addRightHandFeatures(&features, state, idx)
-	parent := state.pending[idx]
-	child := state.pending[idx+1]
-	addBothHandFeatures(&features, parent, child)
-	return features
+func AddUnigramFeatures(features *[]string, state *State, actName string, idx int) {
+	addUnigramFeatures(features, state, actName, idx-2, "p_i-2")
+	addUnigramFeatures(features, state, actName, idx-1, "p_i-1")
+	addUnigramFeatures(features, state, actName, idx, "p_i")
+	addUnigramFeatures(features, state, actName, idx+1, "p_i+1")
+	addUnigramFeatures(features, state, actName, idx+2, "p_i+2")
+	addUnigramFeatures(features, state, actName, idx+3, "p_i+3")
 }
 
-func extractAttachRightFeatures(state *State, idx int) []string {
+func hasNoChildren(w *Word) bool {
+	return len(w.children) == 0
+}
+
+func addStructuralSingleFeatures(features *[]string, state *State, actName string, idx int, prefix string) {
+	if idx < 0 || idx >= len(state.pending) {
+		return
+	}
+	w := state.pending[idx]
+	*features = append(*features,
+		fmt.Sprintf("%s+%s+len:%d", actName, prefix, len(w.children)),
+		fmt.Sprintf("%s+%s+no-children:%t", actName, prefix, hasNoChildren(w)),
+	)
+}
+
+func AddStructuralSingleFeatures(features *[]string, state *State, actName string, idx int) {
+	addStructuralSingleFeatures(features, state, actName, idx-2, "p_i-2")
+	addStructuralSingleFeatures(features, state, actName, idx-1, "p_i-1")
+	addStructuralSingleFeatures(features, state, actName, idx, "p_i")
+	addStructuralSingleFeatures(features, state, actName, idx+1, "p_i+1")
+	addStructuralSingleFeatures(features, state, actName, idx+2, "p_i+2")
+	addStructuralSingleFeatures(features, state, actName, idx+3, "p_i+3")
+}
+
+func addStructuralPairFeatures(features *[]string, actName string, left *Word, right *Word, prefix string) {
+	if left == nil || right == nil {
+		return
+	}
+	dist := int(math.Abs(float64(left.idx - right.idx)))
+
+	*features = append(*features,
+		fmt.Sprintf("%s+%s+dist:%s", actName, prefix, distStr(dist)),
+		fmt.Sprintf("%s+%s+dist:%s+leftPos:%s+rightPos:%s", actName, prefix, distStr(dist), left.posTag, right.posTag),
+	)
+}
+
+func extractFeatures(state *State, actName string, idx int) []string {
 	features := make([]string, 0)
-	addLeftHandFeatures(&features, state, idx)
-	addRightHandFeatures(&features, state, idx)
-	parent := state.pending[idx+1]
-	child := state.pending[idx]
-	addBothHandFeatures(&features, parent, child)
+	AddUnigramFeatures(&features, state, actName, idx)
+	AddStructuralSingleFeatures(&features, state, actName, idx)
+
+	p0 := NilSafePendingWord(state, idx-1)
+	p1 := NilSafePendingWord(state, idx)
+	p2 := NilSafePendingWord(state, idx+1)
+	p3 := NilSafePendingWord(state, idx+2)
+
+	AddBigramFeatures(&features, actName, p1, p2, "p_i+p_{i+1}")
+	AddBigramFeatures(&features, actName, p1, p3, "p_i+p_{i+2}")
+	AddBigramFeatures(&features, actName, p0, p1, "p_{i-1}+p_i")
+	AddBigramFeatures(&features, actName, p0, p3, "p_{i-1}+p_{i+2}")
+	AddBigramFeatures(&features, actName, p2, p3, "p_{i+1}+p_{i+2}")
+
+	addStructuralPairFeatures(&features, actName, p1, p2, "p_i+p_{i+1}")
+	addStructuralPairFeatures(&features, actName, p1, p3, "p_i+p_{i+2}")
+	addStructuralPairFeatures(&features, actName, p0, p1, "p_{i-1}+p_i")
+	addStructuralPairFeatures(&features, actName, p0, p3, "p_{i-1}+p_{i+2}")
+	addStructuralPairFeatures(&features, actName, p2, p3, "p_{i+1}+p_{i+2}")
+
 	return features
 }
 
 func ExtractFeatures(state *State, pair ActionIndexPair) ([]string, error) {
-	if reflect.ValueOf(pair.action).Pointer() == reflect.ValueOf(AttachLeft).Pointer() {
-		return extractAttachLeftFeatures(state, pair.index), nil
-	} else if reflect.ValueOf(pair.action).Pointer() == reflect.ValueOf(AttachRight).Pointer() {
-		return extractAttachRightFeatures(state, pair.index), nil
-	} else {
-		return nil, errors.New("wrong action")
-	}
+	actName := runtime.FuncForPC(reflect.ValueOf(pair.action).Pointer()).Name()
+	return extractFeatures(state, actName, pair.index), nil
 }
