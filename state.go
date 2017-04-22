@@ -56,6 +56,20 @@ func NewState(pending []*Word) *State {
 	return &state
 }
 
+func CopyState(state *State) *State {
+	s := &State{append([]*Word{}, state.pending...), make(map[int]int), FvCache{}, 0.0, append([]string{}, state.appliedFv...)}
+
+	for k, v := range state.arcs {
+		s.arcs[k] = v
+	}
+
+	for k, v := range state.fvCache {
+		s.fvCache[k] = v
+	}
+
+	return s
+}
+
 func (state *State) deletePending(idx int) []*Word {
 	state.pending = append(state.pending[:idx], state.pending[idx+1:]...)
 	return state.pending
