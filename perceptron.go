@@ -117,6 +117,23 @@ func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPa
 	return bestPair
 }
 
+func Expand(weight *map[string]float64, state State) States {
+	pairs := CandidateActions(&state)
+	states := make([]State, 0)
+	for _, pair := range pairs {
+		s := CopyState(&state)
+		fv := s.GetFvCache(pair)
+		score := DotProduct(weight, fv)
+
+		pair.action(s, pair.index)
+		s.ResetFvCache(pair.index)
+		s.appliedFv = append(s.appliedFv, fv...)
+		s.score = s.score + score
+		states = append(states, *s)
+	}
+	return states
+}
+
 func BestAllowedActionIndexPair(weight *map[string]float64, state *State, pairs []ActionIndexPair) ActionIndexPair {
 	bestScore := math.Inf(-1)
 	bestPair := pairs[0]
