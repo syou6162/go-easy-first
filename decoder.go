@@ -36,7 +36,7 @@ func beamSearch(weight *map[string]float64, beam States, beamWidth int) States {
 		states = append(states, Expand(weight, b)...)
 	}
 	sort.Sort(states)
-	return states[0 : beamWidth]
+	return states[0:beamWidth]
 }
 
 func BeamSearch(weight *map[string]float64, sent *Sentence, beamWidth int) *State {
