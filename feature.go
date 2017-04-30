@@ -31,13 +31,13 @@ func addUnigramFeatures(features *[]string, state *State, actName string, idx in
 	lcp := NilSafePosTag(w.LeftMostChild())
 	rcp := NilSafePosTag(w.RightMostChild())
 	*features = append(*features,
-		actName + "+" + prefix + "+surface:" + w.surface,
-		actName + "+" + prefix + "+lemma:" + w.lemma,
-		actName + "+" + prefix + "+posTag:" + w.posTag,
-		actName + "+" + prefix + "+cposTag:" + w.cposTag,
-		actName + "+" + prefix + "+posTag:" + w.posTag + "+leftmost:" + lcp,
-		actName + "+" + prefix + "+posTag:" + w.posTag + "+rightmost:" + rcp,
-		actName + "+" + prefix + "+posTag:" + w.posTag + "+leftmost:" + lcp + "+rightmost:" + rcp,
+		actName+"+"+prefix+"+surface:"+w.surface,
+		actName+"+"+prefix+"+lemma:"+w.lemma,
+		actName+"+"+prefix+"+posTag:"+w.posTag,
+		actName+"+"+prefix+"+cposTag:"+w.cposTag,
+		actName+"+"+prefix+"+posTag:"+w.posTag+"+leftmost:"+lcp,
+		actName+"+"+prefix+"+posTag:"+w.posTag+"+rightmost:"+rcp,
+		actName+"+"+prefix+"+posTag:"+w.posTag+"+leftmost:"+lcp+"+rightmost:"+rcp,
 	)
 }
 
@@ -69,16 +69,16 @@ func AddBigramFeatures(features *[]string, actName string, parent *Word, child *
 	crcp := NilSafePosTag(child.RightMostChild())
 
 	*features = append(*features,
-		actName + "+" + prefix + "+parent-surface:"+ parent.surface + "+child-surface:" + child.surface,
-		actName + "+" + prefix + "+parent-surface:"+ parent.surface + "+child-posTag:" + child.posTag,
-		actName + "+" + prefix + "+parent-posTag:"+ parent.posTag + "+child-surface:" + child.surface,
-		actName + "+" + prefix + "+parent-lemma:"+ parent.lemma + "+child-lemma:" + child.lemma,
-		actName + "+" + prefix + "+parent-posTag:"+ parent.posTag + "+child-posTag:" + child.posTag,
-		actName + "+" + prefix + "+parent-cposTag:"+ parent.cposTag + "+child-cposTag:" + child.cposTag,
-		actName + "+" + prefix + "+parent-posTag:"+ parent.posTag + "+child-posTag:" + child.posTag + "+plcp:" + plcp + "+prcp:" + prcp,
-		actName + "+" + prefix + "+parent-posTag:"+ parent.posTag + "+child-posTag:" + child.posTag + "+plcp:" + plcp + "+crcp:" + crcp,
-		actName + "+" + prefix + "+parent-posTag:"+ parent.posTag + "+child-posTag:" + child.posTag + "+clcp:" + clcp + "+prcp:" + prcp,
-		actName + "+" + prefix + "+parent-posTag:"+ parent.posTag + "+child-posTag:" + child.posTag + "+clcp:" + clcp + "+crcp:" + crcp,
+		actName+"+"+prefix+"+parent-surface:"+parent.surface+"+child-surface:"+child.surface,
+		actName+"+"+prefix+"+parent-surface:"+parent.surface+"+child-posTag:"+child.posTag,
+		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-surface:"+child.surface,
+		actName+"+"+prefix+"+parent-lemma:"+parent.lemma+"+child-lemma:"+child.lemma,
+		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag,
+		actName+"+"+prefix+"+parent-cposTag:"+parent.cposTag+"+child-cposTag:"+child.cposTag,
+		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+plcp:"+plcp+"+prcp:"+prcp,
+		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+plcp:"+plcp+"+crcp:"+crcp,
+		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+clcp:"+clcp+"+prcp:"+prcp,
+		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+clcp:"+clcp+"+crcp:"+crcp,
 	)
 }
 
@@ -101,8 +101,8 @@ func addStructuralSingleFeatures(features *[]string, state *State, actName strin
 	}
 	w := state.pending[idx]
 	*features = append(*features,
-		actName + "+" + prefix + "+len:"+ strconv.Itoa(len(w.children)),
-		actName + "+" + prefix + "+no-children:"+ strconv.FormatBool(hasNoChildren(w)),
+		actName+"+"+prefix+"+len:"+strconv.Itoa(len(w.children)),
+		actName+"+"+prefix+"+no-children:"+strconv.FormatBool(hasNoChildren(w)),
 	)
 }
 
@@ -122,8 +122,8 @@ func addStructuralPairFeatures(features *[]string, actName string, left *Word, r
 	dist := int(math.Abs(float64(left.idx - right.idx)))
 
 	*features = append(*features,
-		actName + "+" + prefix + "+dist:"+ distStr(dist),
-		actName + "+" + prefix + "+dist:"+ distStr(dist) + "+leftPos:" + left.posTag + "+rightPos:" + right.posTag,
+		actName+"+"+prefix+"+dist:"+distStr(dist),
+		actName+"+"+prefix+"+dist:"+distStr(dist)+"+leftPos:"+left.posTag+"+rightPos:"+right.posTag,
 	)
 }
 
