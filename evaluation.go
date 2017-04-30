@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"runtime"
 	"sync"
 )
 
@@ -36,11 +37,15 @@ func DependencyAccuracy(model *Model, sents []*Sentence) float64 {
 	predHeads := make([][]int, 0)
 	w := model.AveragedWeight()
 
+	cpus := runtime.NumCPU()
+	semaphore := make(chan int, cpus)
 	for _, sent := range sents {
 		wg.Add(1)
 		go func(sent *Sentence) {
 			defer wg.Done()
+			semaphore <- 1
 			Decode(&w, sent)
+			<-semaphore
 		}(sent)
 	}
 	wg.Wait()
