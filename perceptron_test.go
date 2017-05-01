@@ -101,36 +101,36 @@ func TestCandidateActions(t *testing.T) {
 }
 
 func TestUpdateWeight(t *testing.T) {
-	model := Model{make(map[string]float64), make(map[string]float64), 1}
-	gold := []string{"1", "2", "3"}
-	predict := []string{"1", "3", "4"}
+	model := Model{make(map[int]float64), make(map[int]float64), 1}
+	gold := []int{1, 2, 3}
+	predict := []int{1, 3, 4}
 	model.updateWeight(&gold, &predict)
 
-	if w, _ := model.weight["1"]; w != 0 {
+	if w, _ := model.weight[1]; w != 0 {
 		t.Error("weight of '1' must be 0")
 	}
-	if w, _ := model.weight["2"]; w != 1 {
+	if w, _ := model.weight[2]; w != 1 {
 		t.Error("weight of '2' must be 1")
 	}
-	if w, _ := model.weight["3"]; w != 0 {
+	if w, _ := model.weight[3]; w != 0 {
 		t.Error("weight of '3' must be 0")
 	}
-	if w, _ := model.weight["4"]; w != -1 {
+	if w, _ := model.weight[4]; w != -1 {
 		t.Error("weight of '4' must be -1")
 	}
 
 	model.updateWeight(&gold, &predict)
 
-	if w, _ := model.cumWeight["1"]; w != 0 {
+	if w, _ := model.cumWeight[1]; w != 0 {
 		t.Error("cumWeight of '1' must be 0")
 	}
-	if w, _ := model.cumWeight["2"]; w != 3 {
+	if w, _ := model.cumWeight[2]; w != 3 {
 		t.Error("cumWeight of '2' must be 3")
 	}
-	if w, _ := model.cumWeight["3"]; w != 0 {
+	if w, _ := model.cumWeight[3]; w != 0 {
 		t.Error("cumWeight of '3' must be 0")
 	}
-	if w, _ := model.cumWeight["4"]; w != -3 {
+	if w, _ := model.cumWeight[4]; w != -3 {
 		t.Error("cumWeight of '4' must be -3")
 	}
 }
@@ -146,7 +146,7 @@ func TestUpdate(t *testing.T) {
 		makeWord(".", ".", 5, 3),
 	)
 	sent := Sentence{words: words}
-	model := Model{make(map[string]float64), make(map[string]float64), 1}
+	model := Model{make(map[int]float64), make(map[int]float64), 1}
 	model.Update(&sent)
 	if model.count == 1 {
 		t.Error("count must be greater than 1")

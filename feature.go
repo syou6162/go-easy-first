@@ -152,7 +152,39 @@ func extractFeatures(state *State, actName string, idx int) []string {
 	return features
 }
 
-func ExtractFeatures(state *State, pair ActionIndexPair) ([]string, error) {
+func mod(n, m int) int {
+	if n < 0 {
+		return (m - (-n % m)) % m
+	} else {
+		return n % m
+	}
+}
+
+var MaxFeatureLength = 1000000
+
+func JenkinsHash(s string) int {
+	hash := 0
+	for _, b := range []byte(s) {
+		hash += int(b)
+		hash += hash << 10
+		hash ^= hash >> 6
+	}
+
+	hash += hash << 3
+	hash ^= hash >> 11
+	hash += hash << 15
+
+	return mod(hash, MaxFeatureLength)
+}
+
+func ExtractFeatures(state *State, pair ActionIndexPair) ([]int, error) {
 	actName := runtime.FuncForPC(reflect.ValueOf(pair.action).Pointer()).Name()
-	return extractFeatures(state, actName, pair.index), nil
+
+	featStrs := extractFeatures(state, actName, pair.index)
+	features := make([]int, len(featStrs))
+	for idx, s := range featStrs {
+		features[idx] = JenkinsHash(s)
+	}
+
+	return features, nil
 }

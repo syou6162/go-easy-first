@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type FvCache map[string][]string
+type FvCache map[string][]int
 
 type State struct {
 	pending []*Word
@@ -56,7 +56,7 @@ func (state *State) ResetFvCache(index int) {
 	}
 }
 
-func (state *State) GetFvCache(pair ActionIndexPair) []string {
+func (state *State) GetFvCache(pair ActionIndexPair) []int {
 	key := state.cacheKeyStr(pair)
 	if fv, ok := state.fvCache[key]; ok {
 		return fv

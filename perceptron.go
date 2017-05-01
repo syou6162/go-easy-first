@@ -92,7 +92,7 @@ func CandidateActions(state *State) []ActionIndexPair {
 	return result
 }
 
-func DotProduct(weight *map[string]float64, fv []string) float64 {
+func DotProduct(weight *map[int]float64, fv []int) float64 {
 	sum := 0.0
 	for _, f := range fv {
 		if v, ok := (*weight)[f]; ok {
@@ -102,7 +102,7 @@ func DotProduct(weight *map[string]float64, fv []string) float64 {
 	return sum
 }
 
-func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPair {
+func BestActionIndexPair(weight *map[int]float64, state *State) ActionIndexPair {
 	bestScore := math.Inf(-1)
 	pairs := CandidateActions(state)
 	bestPair := pairs[0]
@@ -117,7 +117,7 @@ func BestActionIndexPair(weight *map[string]float64, state *State) ActionIndexPa
 	return bestPair
 }
 
-func BestAllowedActionIndexPair(weight *map[string]float64, state *State, pairs []ActionIndexPair) ActionIndexPair {
+func BestAllowedActionIndexPair(weight *map[int]float64, state *State, pairs []ActionIndexPair) ActionIndexPair {
 	bestScore := math.Inf(-1)
 	bestPair := pairs[0]
 	for _, pair := range pairs {
@@ -132,12 +132,12 @@ func BestAllowedActionIndexPair(weight *map[string]float64, state *State, pairs 
 }
 
 type Model struct {
-	weight    map[string]float64
-	cumWeight map[string]float64
+	weight    map[int]float64
+	cumWeight map[int]float64
 	count     int
 }
 
-func (model *Model) updateWeight(goldFeatureVector *[]string, predictFeatureVector *[]string) {
+func (model *Model) updateWeight(goldFeatureVector *[]int, predictFeatureVector *[]int) {
 	for _, feat := range *goldFeatureVector {
 		w, _ := model.weight[feat]
 		cumW, _ := model.cumWeight[feat]
@@ -186,8 +186,8 @@ func (model *Model) Update(gold *Sentence) {
 }
 
 // w_t - w_cum / t
-func (model *Model) AveragedWeight() map[string]float64 {
-	avg := make(map[string]float64)
+func (model *Model) AveragedWeight() map[int]float64 {
+	avg := make(map[int]float64)
 	for k, v := range model.weight {
 		avg[k] = v
 	}
