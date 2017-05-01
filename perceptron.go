@@ -92,17 +92,15 @@ func CandidateActions(state *State) []ActionIndexPair {
 	return result
 }
 
-func DotProduct(weight *map[int]float64, fv []int) float64 {
+func DotProduct(weight *[]float64, fv []int) float64 {
 	sum := 0.0
 	for _, f := range fv {
-		if v, ok := (*weight)[f]; ok {
-			sum += v
-		}
+		sum += (*weight)[f]
 	}
 	return sum
 }
 
-func BestActionIndexPair(weight *map[int]float64, state *State) ActionIndexPair {
+func BestActionIndexPair(weight *[]float64, state *State) ActionIndexPair {
 	bestScore := math.Inf(-1)
 	pairs := CandidateActions(state)
 	bestPair := pairs[0]
@@ -117,7 +115,7 @@ func BestActionIndexPair(weight *map[int]float64, state *State) ActionIndexPair 
 	return bestPair
 }
 
-func BestAllowedActionIndexPair(weight *map[int]float64, state *State, pairs []ActionIndexPair) ActionIndexPair {
+func BestAllowedActionIndexPair(weight *[]float64, state *State, pairs []ActionIndexPair) ActionIndexPair {
 	bestScore := math.Inf(-1)
 	bestPair := pairs[0]
 	for _, pair := range pairs {
@@ -132,21 +130,25 @@ func BestAllowedActionIndexPair(weight *map[int]float64, state *State, pairs []A
 }
 
 type Model struct {
-	weight    map[int]float64
-	cumWeight map[int]float64
+	weight    []float64
+	cumWeight []float64
 	count     int
+}
+
+func NewModel() Model {
+	return Model{make([]float64, MaxFeatureLength), make([]float64, MaxFeatureLength), 1}
 }
 
 func (model *Model) updateWeight(goldFeatureVector *[]int, predictFeatureVector *[]int) {
 	for _, feat := range *goldFeatureVector {
-		w, _ := model.weight[feat]
-		cumW, _ := model.cumWeight[feat]
+		w := model.weight[feat]
+		cumW := model.cumWeight[feat]
 		model.weight[feat] = w + 1.0
 		model.cumWeight[feat] = cumW + float64(model.count)
 	}
 	for _, feat := range *predictFeatureVector {
-		w, _ := model.weight[feat]
-		cumW, _ := model.cumWeight[feat]
+		w := model.weight[feat]
+		cumW := model.cumWeight[feat]
 		model.weight[feat] = w - 1.0
 		model.cumWeight[feat] = cumW - float64(model.count)
 	}
@@ -186,8 +188,8 @@ func (model *Model) Update(gold *Sentence) {
 }
 
 // w_t - w_cum / t
-func (model *Model) AveragedWeight() map[int]float64 {
-	avg := make(map[int]float64)
+func (model *Model) AveragedWeight() []float64 {
+	avg := make([]float64, MaxFeatureLength)
 	for k, v := range model.weight {
 		avg[k] = v
 	}

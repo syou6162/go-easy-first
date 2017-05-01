@@ -4,7 +4,7 @@ func isFinished(state *State) bool {
 	return len(state.pending) == 1
 }
 
-func decode(weight *map[int]float64, state *State) {
+func decode(weight *[]float64, state *State) {
 	if isFinished(state) {
 		// Do nothing
 	} else {
@@ -15,7 +15,7 @@ func decode(weight *map[int]float64, state *State) {
 	}
 }
 
-func Decode(weight *map[int]float64, sent *Sentence) {
+func Decode(weight *[]float64, sent *Sentence) {
 	tmp := make([]*Word, len(sent.words))
 	copy(tmp, sent.words)
 	s := NewState(sent.words)
