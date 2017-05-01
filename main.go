@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"runtime"
 )
 
 func shuffle(data []*Sentence) {
@@ -16,6 +17,7 @@ func shuffle(data []*Sentence) {
 }
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		panic(err)
