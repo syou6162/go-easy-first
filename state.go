@@ -10,9 +10,25 @@ import (
 type FvCache map[string][]string
 
 type State struct {
-	pending []*Word
-	arcs    map[int]int
-	fvCache FvCache
+	pending   []*Word
+	arcs      map[int]int
+	fvCache   FvCache
+	score     float64
+	appliedFv []string
+}
+
+type States []State
+
+func (slice States) Len() int {
+	return len(slice)
+}
+
+func (slice States) Less(i, j int) bool {
+	return slice[i].score > slice[j].score
+}
+
+func (slice States) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
 }
 
 func (state *State) cacheKeyStr(pair ActionIndexPair) string {
@@ -35,9 +51,23 @@ func (state *State) InitFvCache() {
 func NewState(pending []*Word) *State {
 	p := make([]*Word, len(pending))
 	copy(p, pending)
-	state := State{p, make(map[int]int), FvCache{}}
+	state := State{p, make(map[int]int), FvCache{}, 0.0, make([]string, 0)}
 	state.InitFvCache()
 	return &state
+}
+
+func CopyState(state *State) *State {
+	s := &State{append([]*Word{}, state.pending...), make(map[int]int), FvCache{}, 0.0, append([]string{}, state.appliedFv...)}
+
+	for k, v := range state.arcs {
+		s.arcs[k] = v
+	}
+
+	for k, v := range state.fvCache {
+		s.fvCache[k] = v
+	}
+
+	return s
 }
 
 func (state *State) deletePending(idx int) []*Word {
