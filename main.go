@@ -36,7 +36,7 @@ func main() {
 	goldSents := sentences[0:splitPos]
 	devSents := sentences[splitPos+1 : len(sentences)-1]
 
-	model := Model{make(map[int]float64), make(map[int]float64), 1}
+	model := NewModel()
 
 	for iter := 0; iter < 10; iter++ {
 		shuffle(goldSents)
