@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/codegangsta/cli"
+	"github.com/olekukonko/tablewriter"
 	"math/rand"
 	"os"
 	"runtime"
+	"time"
 )
 
 func shuffle(data []*Sentence) {
@@ -31,8 +33,22 @@ Train a parsing model by easy-first algorithm.
 	},
 }
 
+var commandEval = cli.Command{
+	Name:  "eval",
+	Usage: "Evaluate a parsing model by easy-first algorithm",
+	Description: `
+Evaluate a parsing model by easy-first algorithm.
+`,
+	Action: doEval,
+	Flags: []cli.Flag{
+		cli.StringFlag{Name: "test-filename"},
+		cli.StringFlag{Name: "model-filename"},
+	},
+}
+
 var Commands = []cli.Command{
 	commandTrain,
+	commandEval,
 }
 
 func doTrain(c *cli.Context) error {
@@ -73,6 +89,39 @@ func doTrain(c *cli.Context) error {
 
 	w := model.AveragedWeight()
 	SaveModel(&w, modelFilename)
+	return nil
+}
+
+func doEval(c *cli.Context) error {
+	testFilename := c.String("test-filename")
+	modelFilename := c.String("model-filename")
+
+	if testFilename == "" {
+		_ = cli.ShowCommandHelp(c, "eval")
+		return cli.NewExitError("`test-filename` is a required field to evaluate a parser.", 1)
+	}
+
+	if modelFilename == "" {
+		_ = cli.ShowCommandHelp(c, "eval")
+		return cli.NewExitError("`model-filename` is a required field to evaluate a parser.", 1)
+	}
+
+	goldSents, _ := ReadData(testFilename)
+	weight, _ := LoadModel(modelFilename)
+	start := time.Now()
+	testAccuracy := DependencyAccuracy(weight, goldSents)
+	end := time.Now().Sub(start).Seconds()
+
+	data := [][]string{
+		[]string{fmt.Sprintf("%d", len(goldSents)), fmt.Sprintf("%0.02f", end), fmt.Sprintf("%0.03f", testAccuracy)},
+	}
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Sentences", "Seconds", "Accuracy"})
+	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	table.SetCenterSeparator("|")
+	table.AppendBulk(data) // Add Bulk Data
+	table.Render()
+
 	return nil
 }
 
