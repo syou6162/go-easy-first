@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"errors"
+	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
-	"os"
-	"bufio"
-	"io/ioutil"
 )
 
 func makeSentence(s string) (*Sentence, error) {
