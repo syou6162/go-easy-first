@@ -177,9 +177,9 @@ func JenkinsHash(s string) int {
 	return mod(hash, MaxFeatureLength)
 }
 
-func ExtractFeatures(state *State, pair ActionIndexPair) ([]int, error) {
+func ExtractFeatures(state *State, pair ActionIndexPair) []int {
 	actName := runtime.FuncForPC(reflect.ValueOf(pair.action).Pointer()).Name()
 
 	features := extractFeatures(state, actName, pair.index)
-	return features, nil
+	return features
 }
