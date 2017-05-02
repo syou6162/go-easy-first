@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math/rand"
-	"os"
 	"runtime"
 )
 
@@ -18,26 +16,10 @@ func shuffle(data []*Sentence) {
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		panic(err)
-	}
-
-	sentences := make([]*Sentence, 0)
-	for _, sent := range splitBySentence(string(data)) {
-		s, err := makeSentence(sent)
-		if err != nil {
-			break
-		}
-		sentences = append(sentences, s)
-	}
-
-	splitPos := int(float64(len(sentences)) * 0.8)
-	goldSents := sentences[0:splitPos]
-	devSents := sentences[splitPos+1 : len(sentences)-1]
+	goldSents, _ := ReadData("/Users/yasuhisa/Desktop/work/easy-first/dev.txt")
+	devSents, _ := ReadData("/Users/yasuhisa/Desktop/work/easy-first/test.txt")
 
 	model := NewModel()
-
 	for iter := 0; iter < 10; iter++ {
 		shuffle(goldSents)
 		for _, sent := range goldSents {
