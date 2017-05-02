@@ -34,7 +34,7 @@ func (state *State) InitFvCache() {
 
 func NewState(pending []*Word) *State {
 	for _, w := range pending {
-		w.children = make([]*Word, 0)
+		w.children = make([]Word, 0)
 	}
 	p := make([]*Word, len(pending))
 	copy(p, pending)
