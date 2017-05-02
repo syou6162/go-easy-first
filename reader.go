@@ -2,12 +2,12 @@ package main
 
 import (
 	"bufio"
+	"encoding/gob"
 	"errors"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
-	"encoding/gob"
 )
 
 func makeSentence(s string) (*Sentence, error) {
