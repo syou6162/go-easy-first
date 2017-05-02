@@ -15,7 +15,7 @@ func TestAddUnigramFeatures(t *testing.T) {
 		makeWord(".", ".", 5, 3),
 	)
 	s := NewState(words)
-	features := make([]string, 0)
+	features := make([]int, 0)
 	AddUnigramFeatures(&features, s, "left", 1)
 
 	if len(features) == 0 {
