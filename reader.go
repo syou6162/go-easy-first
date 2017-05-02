@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"encoding/gob"
 )
 
 func makeSentence(s string) (*Sentence, error) {
@@ -54,4 +55,29 @@ func ReadData(filename string) ([]*Sentence, error) {
 		sentences = append(sentences, s)
 	}
 	return sentences, nil
+}
+
+func SaveModel(weight *[]float64, filename string) error {
+	file, err := os.Create(filename)
+	defer file.Close()
+	if err != nil {
+		return err
+	}
+
+	enc := gob.NewEncoder(file)
+	enc.Encode(&weight)
+	return nil
+}
+
+func LoadModel(filename string) (*[]float64, error) {
+	var w []float64
+	file, err := os.Open(filename)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	decoder := gob.NewDecoder(file)
+	decoder.Decode(&w)
+	return &w, nil
 }
