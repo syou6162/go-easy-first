@@ -23,7 +23,7 @@ func NilSafePendingWord(state *State, idx int) *Word {
 	}
 }
 
-func addUnigramFeatures(features *[]string, state *State, actName string, idx int, prefix string) {
+func addUnigramFeatures(features *[]int, state *State, actName string, idx int, prefix string) {
 	if idx < 0 || idx >= len(state.pending) {
 		return
 	}
@@ -31,13 +31,13 @@ func addUnigramFeatures(features *[]string, state *State, actName string, idx in
 	lcp := NilSafePosTag(w.LeftMostChild())
 	rcp := NilSafePosTag(w.RightMostChild())
 	*features = append(*features,
-		actName+"+"+prefix+"+surface:"+w.surface,
-		actName+"+"+prefix+"+lemma:"+w.lemma,
-		actName+"+"+prefix+"+posTag:"+w.posTag,
-		actName+"+"+prefix+"+cposTag:"+w.cposTag,
-		actName+"+"+prefix+"+posTag:"+w.posTag+"+leftmost:"+lcp,
-		actName+"+"+prefix+"+posTag:"+w.posTag+"+rightmost:"+rcp,
-		actName+"+"+prefix+"+posTag:"+w.posTag+"+leftmost:"+lcp+"+rightmost:"+rcp,
+		JenkinsHash(actName+"+"+prefix+"+surface:"+w.surface),
+		JenkinsHash(actName+"+"+prefix+"+lemma:"+w.lemma),
+		JenkinsHash(actName+"+"+prefix+"+posTag:"+w.posTag),
+		JenkinsHash(actName+"+"+prefix+"+cposTag:"+w.cposTag),
+		JenkinsHash(actName+"+"+prefix+"+posTag:"+w.posTag+"+leftmost:"+lcp),
+		JenkinsHash(actName+"+"+prefix+"+posTag:"+w.posTag+"+rightmost:"+rcp),
+		JenkinsHash(actName+"+"+prefix+"+posTag:"+w.posTag+"+leftmost:"+lcp+"+rightmost:"+rcp),
 	)
 }
 
@@ -58,7 +58,7 @@ func distStr(dist int) string {
 	return d
 }
 
-func AddBigramFeatures(features *[]string, actName string, parent *Word, child *Word, prefix string) {
+func AddBigramFeatures(features *[]int, actName string, parent *Word, child *Word, prefix string) {
 	if parent == nil || child == nil {
 		return
 	}
@@ -69,20 +69,20 @@ func AddBigramFeatures(features *[]string, actName string, parent *Word, child *
 	crcp := NilSafePosTag(child.RightMostChild())
 
 	*features = append(*features,
-		actName+"+"+prefix+"+parent-surface:"+parent.surface+"+child-surface:"+child.surface,
-		actName+"+"+prefix+"+parent-surface:"+parent.surface+"+child-posTag:"+child.posTag,
-		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-surface:"+child.surface,
-		actName+"+"+prefix+"+parent-lemma:"+parent.lemma+"+child-lemma:"+child.lemma,
-		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag,
-		actName+"+"+prefix+"+parent-cposTag:"+parent.cposTag+"+child-cposTag:"+child.cposTag,
-		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+plcp:"+plcp+"+prcp:"+prcp,
-		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+plcp:"+plcp+"+crcp:"+crcp,
-		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+clcp:"+clcp+"+prcp:"+prcp,
-		actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+clcp:"+clcp+"+crcp:"+crcp,
+		JenkinsHash(actName+"+"+prefix+"+parent-surface:"+parent.surface+"+child-surface:"+child.surface),
+		JenkinsHash(actName+"+"+prefix+"+parent-surface:"+parent.surface+"+child-posTag:"+child.posTag),
+		JenkinsHash(actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-surface:"+child.surface),
+		JenkinsHash(actName+"+"+prefix+"+parent-lemma:"+parent.lemma+"+child-lemma:"+child.lemma),
+		JenkinsHash(actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag),
+		JenkinsHash(actName+"+"+prefix+"+parent-cposTag:"+parent.cposTag+"+child-cposTag:"+child.cposTag),
+		JenkinsHash(actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+plcp:"+plcp+"+prcp:"+prcp),
+		JenkinsHash(actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+plcp:"+plcp+"+crcp:"+crcp),
+		JenkinsHash(actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+clcp:"+clcp+"+prcp:"+prcp),
+		JenkinsHash(actName+"+"+prefix+"+parent-posTag:"+parent.posTag+"+child-posTag:"+child.posTag+"+clcp:"+clcp+"+crcp:"+crcp),
 	)
 }
 
-func AddUnigramFeatures(features *[]string, state *State, actName string, idx int) {
+func AddUnigramFeatures(features *[]int, state *State, actName string, idx int) {
 	addUnigramFeatures(features, state, actName, idx-2, "p_i-2")
 	addUnigramFeatures(features, state, actName, idx-1, "p_i-1")
 	addUnigramFeatures(features, state, actName, idx, "p_i")
@@ -95,18 +95,18 @@ func hasNoChildren(w *Word) bool {
 	return len(w.children) == 0
 }
 
-func addStructuralSingleFeatures(features *[]string, state *State, actName string, idx int, prefix string) {
+func addStructuralSingleFeatures(features *[]int, state *State, actName string, idx int, prefix string) {
 	if idx < 0 || idx >= len(state.pending) {
 		return
 	}
 	w := state.pending[idx]
 	*features = append(*features,
-		actName+"+"+prefix+"+len:"+strconv.Itoa(len(w.children)),
-		actName+"+"+prefix+"+no-children:"+strconv.FormatBool(hasNoChildren(w)),
+		JenkinsHash(actName+"+"+prefix+"+len:"+strconv.Itoa(len(w.children))),
+		JenkinsHash(actName+"+"+prefix+"+no-children:"+strconv.FormatBool(hasNoChildren(w))),
 	)
 }
 
-func AddStructuralSingleFeatures(features *[]string, state *State, actName string, idx int) {
+func AddStructuralSingleFeatures(features *[]int, state *State, actName string, idx int) {
 	addStructuralSingleFeatures(features, state, actName, idx-2, "p_i-2")
 	addStructuralSingleFeatures(features, state, actName, idx-1, "p_i-1")
 	addStructuralSingleFeatures(features, state, actName, idx, "p_i")
@@ -115,20 +115,20 @@ func AddStructuralSingleFeatures(features *[]string, state *State, actName strin
 	addStructuralSingleFeatures(features, state, actName, idx+3, "p_i+3")
 }
 
-func addStructuralPairFeatures(features *[]string, actName string, left *Word, right *Word, prefix string) {
+func addStructuralPairFeatures(features *[]int, actName string, left *Word, right *Word, prefix string) {
 	if left == nil || right == nil {
 		return
 	}
 	dist := int(math.Abs(float64(left.idx - right.idx)))
 
 	*features = append(*features,
-		actName+"+"+prefix+"+dist:"+distStr(dist),
-		actName+"+"+prefix+"+dist:"+distStr(dist)+"+leftPos:"+left.posTag+"+rightPos:"+right.posTag,
+		JenkinsHash(actName+"+"+prefix+"+dist:"+distStr(dist)),
+		JenkinsHash(actName+"+"+prefix+"+dist:"+distStr(dist)+"+leftPos:"+left.posTag+"+rightPos:"+right.posTag),
 	)
 }
 
-func extractFeatures(state *State, actName string, idx int) []string {
-	features := make([]string, 0)
+func extractFeatures(state *State, actName string, idx int) []int {
+	features := make([]int, 0)
 	AddUnigramFeatures(&features, state, actName, idx)
 	AddStructuralSingleFeatures(&features, state, actName, idx)
 
@@ -177,14 +177,9 @@ func JenkinsHash(s string) int {
 	return mod(hash, MaxFeatureLength)
 }
 
-func ExtractFeatures(state *State, pair ActionIndexPair) ([]int, error) {
+func ExtractFeatures(state *State, pair ActionIndexPair) []int {
 	actName := runtime.FuncForPC(reflect.ValueOf(pair.action).Pointer()).Name()
 
-	featStrs := extractFeatures(state, actName, pair.index)
-	features := make([]int, len(featStrs))
-	for idx, s := range featStrs {
-		features[idx] = JenkinsHash(s)
-	}
-
-	return features, nil
+	features := extractFeatures(state, actName, pair.index)
+	return features
 }
