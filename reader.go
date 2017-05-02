@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"errors"
+	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -29,4 +32,26 @@ func makeSentence(s string) (*Sentence, error) {
 
 func splitBySentence(s string) []string {
 	return strings.Split(s, "\n\n")
+}
+
+func ReadData(filename string) ([]*Sentence, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := ioutil.ReadAll(bufio.NewReader(file))
+	if err != nil {
+		return nil, err
+	}
+
+	sentences := make([]*Sentence, 0)
+	for _, sent := range splitBySentence(string(data)) {
+		s, err := makeSentence(sent)
+		if err != nil {
+			break
+		}
+		sentences = append(sentences, s)
+	}
+	return sentences, nil
 }
