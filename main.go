@@ -26,6 +26,7 @@ Train a parsing model by easy-first algorithm.
 	Flags: []cli.Flag{
 		cli.StringFlag{Name: "train-filename"},
 		cli.StringFlag{Name: "dev-filename"},
+		cli.StringFlag{Name: "model-filename"},
 		cli.IntFlag{Name: "max-iter", Value: 10},
 	},
 }
@@ -37,6 +38,7 @@ var Commands = []cli.Command{
 func doTrain(c *cli.Context) error {
 	trainFilename := c.String("train-filename")
 	devFilename := c.String("dev-filename")
+	modelFilename := c.String("model-filename")
 	maxIter := c.Int("max-iter")
 
 	if trainFilename == "" {
@@ -49,6 +51,11 @@ func doTrain(c *cli.Context) error {
 		return cli.NewExitError("`dev-filename` is a required field to train a parser.", 1)
 	}
 
+	if modelFilename == "" {
+		_ = cli.ShowCommandHelp(c, "train")
+		return cli.NewExitError("`model-filename` is a required field to train a parser.", 1)
+	}
+
 	goldSents, _ := ReadData(trainFilename)
 	devSents, _ := ReadData(devFilename)
 
@@ -58,11 +65,14 @@ func doTrain(c *cli.Context) error {
 		for _, sent := range goldSents {
 			model.Update(sent)
 		}
-
-		trainAccuracy := DependencyAccuracy(&model, goldSents)
-		devAccuracy := DependencyAccuracy(&model, devSents)
+		w := model.AveragedWeight()
+		trainAccuracy := DependencyAccuracy(&w, goldSents)
+		devAccuracy := DependencyAccuracy(&w, devSents)
 		fmt.Println(fmt.Sprintf("%d, %0.03f, %0.03f", iter, trainAccuracy, devAccuracy))
 	}
+
+	w := model.AveragedWeight()
+	SaveModel(&w, modelFilename)
 	return nil
 }
 
