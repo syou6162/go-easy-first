@@ -27,7 +27,7 @@ func dependencyAccuracy(golds [][]int, predictions [][]int) (float64, error) {
 	return sum / count, nil
 }
 
-func DependencyAccuracy(model *Model, sents []*Sentence) float64 {
+func DependencyAccuracy(w *[]float64, sents []*Sentence) float64 {
 	wg := &sync.WaitGroup{}
 	goldHeads := make([][]int, 0)
 	for _, sent := range sents {
@@ -35,7 +35,6 @@ func DependencyAccuracy(model *Model, sents []*Sentence) float64 {
 	}
 
 	predHeads := make([][]int, 0)
-	w := model.AveragedWeight()
 
 	cpus := runtime.NumCPU()
 	semaphore := make(chan int, cpus)
@@ -44,7 +43,7 @@ func DependencyAccuracy(model *Model, sents []*Sentence) float64 {
 		go func(sent *Sentence) {
 			defer wg.Done()
 			semaphore <- 1
-			Decode(&w, sent)
+			Decode(w, sent)
 			<-semaphore
 		}(sent)
 	}
