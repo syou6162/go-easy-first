@@ -16,8 +16,6 @@ func decode(weight *[]float64, state *State) {
 }
 
 func Decode(weight *[]float64, sent *Sentence) {
-	tmp := make([]*Word, len(sent.words))
-	copy(tmp, sent.words)
 	s := NewState(sent.words)
 	decode(weight, s)
 
