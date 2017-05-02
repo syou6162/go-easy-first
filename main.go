@@ -17,12 +17,12 @@ func shuffle(data []*Sentence) {
 }
 
 var commandTrain = cli.Command{
-	Name:        "train",
-	Usage:       "Train a parsing model by easy-first algorithm",
+	Name:  "train",
+	Usage: "Train a parsing model by easy-first algorithm",
 	Description: `
 Train a parsing model by easy-first algorithm.
 `,
-	Action:      doTrain,
+	Action: doTrain,
 	Flags: []cli.Flag{
 		cli.StringFlag{Name: "train-filename"},
 		cli.StringFlag{Name: "dev-filename"},
