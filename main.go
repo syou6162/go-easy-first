@@ -113,7 +113,7 @@ func doEval(c *cli.Context) error {
 	end := time.Now().Sub(start).Seconds()
 
 	data := [][]string{
-		[]string{fmt.Sprintf("%d", len(goldSents)), fmt.Sprintf("%0.02f", end), fmt.Sprintf("%0.03f", testAccuracy)},
+		{fmt.Sprintf("%d", len(goldSents)), fmt.Sprintf("%0.02f", end), fmt.Sprintf("%0.03f", testAccuracy)},
 	}
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Sentences", "Seconds", "Accuracy"})
