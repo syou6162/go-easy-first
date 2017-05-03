@@ -1,9 +1,9 @@
 # go-easy-first
 [![CircleCI](https://circleci.com/gh/syou6162/go-easy-first.svg?style=shield)](https://circleci.com/gh/syou6162/go-easy-first)
 [![Go Report Card](https://goreportcard.com/badge/github.com/syou6162/go-easy-first)](https://goreportcard.com/report/github.com/syou6162/go-easy-first)
+[![Coverage Status](https://coveralls.io/repos/github/syou6162/go-easy-first/badge.svg?branch=coveralls)](https://coveralls.io/github/syou6162/go-easy-first?branch=coveralls)
 
 go-easy-first - Dependency Parser with Easy-First Algorithm written in Go.
-
 
 # Build from source
 
