@@ -21,6 +21,15 @@ func shuffle(data []*Sentence) {
 	}
 }
 
+func printEvaluation(data [][]string) {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Sentences", "Seconds", "Accuracy"})
+	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	table.SetCenterSeparator("|")
+	table.AppendBulk(data) // Add Bulk Data
+	table.Render()
+}
+
 var commandTrain = cli.Command{
 	Name:  "train",
 	Usage: "Train a parsing model by easy-first algorithm",
@@ -132,13 +141,7 @@ func doEval(c *cli.Context) error {
 	data := [][]string{
 		{fmt.Sprintf("%d", len(goldSents)), fmt.Sprintf("%0.02f", end), fmt.Sprintf("%0.03f", testAccuracy)},
 	}
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Sentences", "Seconds", "Accuracy"})
-	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-	table.SetCenterSeparator("|")
-	table.AppendBulk(data) // Add Bulk Data
-	table.Render()
-
+	printEvaluation(data)
 	return nil
 }
 
@@ -178,12 +181,7 @@ func doDecode(c *cli.Context) error {
 	data := [][]string{
 		{fmt.Sprintf("%d", len(goldSents)), fmt.Sprintf("%0.02f", end), fmt.Sprintf("%0.03f", testAccuracy)},
 	}
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Sentences", "Seconds", "Accuracy"})
-	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
-	table.SetCenterSeparator("|")
-	table.AppendBulk(data) // Add Bulk Data
-	table.Render()
+	printEvaluation(data)
 	return nil
 }
 
