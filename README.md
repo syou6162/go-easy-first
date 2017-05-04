@@ -48,7 +48,7 @@ To see the detail options, type `./go-easy-first eval --help`.
 ```sh
 % ./go-easy-first train --train-filename path/to/train.txt --dev-filename path/to/dev.txt --max-iter 10 --model-filename data/model.bin
 % make bindata && make build
-% ./go-easy-first decode --test-filename /Users/yasuhisa/Desktop/work/easy-first/test.txt
+% ./go-easy-first decode --test-filename path/to/test.txt
 ```
 
 # Roadmap
