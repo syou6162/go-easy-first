@@ -163,8 +163,8 @@ func doDecode(c *cli.Context) error {
 	testFilename := c.String("test-filename")
 
 	if testFilename == "" {
-		_ = cli.ShowCommandHelp(c, "eval")
-		return cli.NewExitError("`test-filename` is a required field to evaluate a parser.", 1)
+		_ = cli.ShowCommandHelp(c, "decode")
+		return cli.NewExitError("`test-filename` is a required field to decode sentences.", 1)
 	}
 
 	goldSents, _ := ReadData(testFilename)
