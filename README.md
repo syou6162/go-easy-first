@@ -43,7 +43,7 @@ To see the detail options, type `./go-easy-first eval --help`.
 |      1346 |    4.60 |    0.888 |
 ```
 
-# Raadmap
+# Roadmap
 - [ ] Implement PP-Attachment features
 - [ ] Beam search with max-violation perceptron
 - [ ] Mini-batch update
