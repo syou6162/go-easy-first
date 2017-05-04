@@ -10,7 +10,7 @@ go-easy-first - Dependency Parser with Easy-First Algorithm (An Efficient Algori
 ```sh
 % git clone https://github.com/syou6162/go-easy-first.git
 % cd go-easy-first
-% go build
+% make deps && make bindata && make build
 ```
 
 # Usage
