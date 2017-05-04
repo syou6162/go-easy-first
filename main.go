@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/olekukonko/tablewriter"
@@ -46,9 +48,23 @@ Evaluate a parsing model by easy-first algorithm.
 	},
 }
 
+// This is an experimental feature
+var commandDecode = cli.Command{
+	Name:  "decode",
+	Usage: "Decode a sentence with an embeded model",
+	Description: `
+Decode a sentence with an embeded model.
+`,
+	Action: doDecode,
+	Flags: []cli.Flag{
+		cli.StringFlag{Name: "test-filename"},
+	},
+}
+
 var Commands = []cli.Command{
 	commandTrain,
 	commandEval,
+	commandDecode,
 }
 
 func doTrain(c *cli.Context) error {
@@ -122,6 +138,51 @@ func doEval(c *cli.Context) error {
 	table.AppendBulk(data) // Add Bulk Data
 	table.Render()
 
+	return nil
+}
+
+func loadModel(filename string) (*[]float64, error) {
+	var weight []float64
+	var b bytes.Buffer
+	tmp, err := Asset(filename)
+	if err != nil {
+		return nil, err
+	}
+	b.Write(tmp)
+
+	decoder := gob.NewDecoder(&b)
+	decoder.Decode(&weight)
+	return &weight, nil
+}
+
+func doDecode(c *cli.Context) error {
+	testFilename := c.String("test-filename")
+
+	if testFilename == "" {
+		_ = cli.ShowCommandHelp(c, "eval")
+		return cli.NewExitError("`test-filename` is a required field to evaluate a parser.", 1)
+	}
+
+	goldSents, _ := ReadData(testFilename)
+
+	weight, err := loadModel("data/model.bin")
+	if err != nil {
+		return err
+	}
+
+	start := time.Now()
+	testAccuracy := DependencyAccuracy(weight, goldSents)
+	end := time.Now().Sub(start).Seconds()
+
+	data := [][]string{
+		{fmt.Sprintf("%d", len(goldSents)), fmt.Sprintf("%0.02f", end), fmt.Sprintf("%0.03f", testAccuracy)},
+	}
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Sentences", "Seconds", "Accuracy"})
+	table.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	table.SetCenterSeparator("|")
+	table.AppendBulk(data) // Add Bulk Data
+	table.Render()
 	return nil
 }
 
