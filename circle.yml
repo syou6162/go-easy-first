@@ -6,9 +6,7 @@ dependencies:
   pre:
     - make deps
     - go get -t -d -v ./...
-    - pwd
-    - ls
-    - /home/ubuntu/.go_workspace/bin/go-bindata -ignore='.gitkeep' data
+    - make bindata
     - make build
 
 test:
