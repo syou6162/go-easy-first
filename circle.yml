@@ -4,7 +4,7 @@ machine:
 
 test:
   pre:
-    - go get github.com/mattn/goveralls
+    - make deps
   override:
     - go test -v ./...
     - test `gofmt -l . | wc -l` = 0
