@@ -5,8 +5,8 @@ machine:
 dependencies:
   pre:
     - make deps
-    - /home/ubuntu/.go_workspace/bin/go-bindata -ignore='\.gitkeep' data
     - go get -t -d -v ./...
+    - /home/ubuntu/.go_workspace/bin/go-bindata -ignore='.gitkeep' data
     - make build
 
 test:
