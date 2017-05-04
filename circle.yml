@@ -4,10 +4,9 @@ machine:
 
 test:
   pre:
-    - go get github.com/mattn/goveralls
+    - make deps
   override:
-    - go test -v ./...
     - test `gofmt -l . | wc -l` = 0
-    - go test -v -cover -race -coverprofile=/home/ubuntu/coverage.out
+    - make cover COVERAGE='/home/ubuntu/coverage.out'
   post:
     - /home/ubuntu/.go_workspace/bin/goveralls -coverprofile=/home/ubuntu/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
