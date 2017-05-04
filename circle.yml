@@ -5,6 +5,7 @@ machine:
 test:
   pre:
     - make deps
+    - make bindata
   override:
     - test `gofmt -l . | wc -l` = 0
     - make cover COVERAGE='/home/ubuntu/coverage.out'
