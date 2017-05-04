@@ -47,6 +47,7 @@ To see the detail options, type `./go-easy-first eval --help`.
 - [ ] Implement PP-Attachment features
 - [ ] Beam search with max-violation perceptron
 - [ ] Mini-batch update
+- [ ] Embed weight parameters to a built binary file using go-bindata
 
 # Author
 Yasuhisa Yoshida
