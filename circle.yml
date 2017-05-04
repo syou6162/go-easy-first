@@ -2,6 +2,13 @@ machine:
   timezone:
     Asia/Tokyo
 
+dependencies:
+  pre:
+    - make deps
+    - make bindata
+    - go get -t -d -v ./...
+    - make build
+
 test:
   pre:
     - make deps

@@ -13,7 +13,7 @@ bindata:
 
 .PHONY: build
 build:
-	go build
+	go build -v
 
 .PHONY: fmt
 fmt:
