@@ -6,7 +6,6 @@ test:
   pre:
     - make deps
   override:
-    - go test -v ./...
     - test `gofmt -l . | wc -l` = 0
     - make cover COVERAGE='/home/ubuntu/coverage.out'
   post:
