@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"github.com/codegangsta/cli"
-	"github.com/olekukonko/tablewriter"
 	"math/rand"
 	"os"
 	"runtime"
 	"time"
+
+	"github.com/codegangsta/cli"
+	"github.com/olekukonko/tablewriter"
 )
 
 func shuffle(data []*Sentence) {
