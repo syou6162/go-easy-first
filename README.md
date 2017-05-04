@@ -10,7 +10,7 @@ go-easy-first - Dependency Parser with Easy-First Algorithm (An Efficient Algori
 ```sh
 % git clone https://github.com/syou6162/go-easy-first.git
 % cd go-easy-first
-% go build
+% make deps && make bindata && make build
 ```
 
 # Usage
@@ -36,18 +36,26 @@ To see the detail options, type `./go-easy-first train --help`.
 ## Evaluating a trained parser
 To see the detail options, type `./go-easy-first eval --help`.
 
-```
+```sh
 % ./go-easy-first eval --test-filename path/to/test.txt --model-filename model.bin
 | SENTENCES | SECONDS | ACCURACY |
 |-----------|---------|----------|
 |      1346 |    4.60 |    0.888 |
 ```
 
-# Raadmap
+## [Experimental] Obtain a single binary embedded model parameters
+
+```sh
+% ./go-easy-first train --train-filename path/to/train.txt --dev-filename path/to/dev.txt --max-iter 10 --model-filename data/model.bin
+% make bindata && make build
+% ./go-easy-first decode --test-filename /Users/yasuhisa/Desktop/work/easy-first/test.txt
+```
+
+# Roadmap
 - [ ] Implement PP-Attachment features
 - [ ] Beam search with max-violation perceptron
 - [ ] Mini-batch update
-- [ ] Embed weight parameters to a built binary file using go-bindata
+- [x] Embed weight parameters to a built binary file using go-bindata
 
 # Author
 Yasuhisa Yoshida
