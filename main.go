@@ -9,8 +9,8 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/codegangsta/cli"
 	"github.com/olekukonko/tablewriter"
+	"github.com/urfave/cli"
 )
 
 func shuffle(data []*Sentence) {
