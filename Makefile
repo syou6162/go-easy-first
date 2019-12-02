@@ -9,7 +9,7 @@ deps:
 
 .PHONY: bindata
 bindata:
-	go-bindata -ignore='\.gitkeep' data
+	${GOPATH}/bin/go-bindata -ignore='\.gitkeep' data
 
 .PHONY: build
 build:
